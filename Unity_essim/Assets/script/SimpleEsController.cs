@@ -1,6 +1,8 @@
 using UnityEngine;
+using System.IO.Ports;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 
 [System.Serializable]
 public class AxleInfo_es {
@@ -13,6 +15,13 @@ public class SimpleEsController : MonoBehaviour {
     public List<AxleInfo_es> AxleInfo_ess; 
     public float maxMotorTorque;
     public float maxSteeringAngle;
+
+    // Communication with Arduino
+    SerialPort data_stream = new SerialPort("/dev/cu.usbmodem21101", 115200);
+    public string receivedstring;
+
+
+
      
     // 対応する視覚的なホイールを見つけます
     // Transform を正しく適用します
@@ -34,8 +43,17 @@ public class SimpleEsController : MonoBehaviour {
      
     public void FixedUpdate()
     {
-        float motor = maxMotorTorque * Input.GetAxis("Vertical");
-        float steering = maxSteeringAngle * Input.GetAxis("Horizontal");
+        //float motor = maxMotorTorque * Input.GetAxis("Vertical");
+        //float steering = maxSteeringAngle * Input.GetAxis("Horizontal");
+
+        receivedstring = data_stream.ReadLine();
+        string[] datas = receivedstring.Split(',');
+        movementX = float.Parse(datas[0]);
+        movementY = float.Parse(datas[1]);
+
+        float motor = maxMotorTorque * movementX;
+        float steering = maxSteeringAngle * movementY;
+
      
         foreach (AxleInfo_es AxleInfo_es in AxleInfo_ess) {
             if (AxleInfo_es.steering) {
