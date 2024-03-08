@@ -17,19 +17,23 @@ public class SimpleEsController : MonoBehaviour {
     public float maxSteeringAngle;
 
     // Movement along X and Y axes.
-    private float movementX;
-    private float movementY;
+    public float movementX;
+    public float movementY;
 
     // Communication with Arduino
     SerialPort data_stream = new SerialPort("/dev/cu.usbmodem1101", 115200);
     public string receivedstring;
-
+public bool running=false;
     void Start()
         {
-            data_stream.Open(); //Initiate the Serial stream
+            running=true;
+            StartCoroutine(GetSerialData());
+            //Initiate the Serial stream
         }
 
-
+void OnDestroy(){
+    running=false;
+}
      
     // 対応する視覚的なホイールを見つけます
     // Transform を正しく適用します
@@ -51,17 +55,14 @@ public class SimpleEsController : MonoBehaviour {
      
     public void Update()
     {
-        float motor = maxMotorTorque * Input.GetAxis("Vertical");
-        float steering = maxSteeringAngle * Input.GetAxis("Horizontal");
+        // float motor = maxMotorTorque * Input.GetAxis("Vertical");
+        // float steering = maxSteeringAngle * Input.GetAxis("Horizontal");
 
-        receivedstring = data_stream.ReadLine();
-        string[] datas = receivedstring.Split(',');
-        movementX = float.Parse(datas[0]);
-        movementY = float.Parse(datas[1]);
+        
 
-        //float motor = maxMotorTorque * movementX;
-        //float steering = maxSteeringAngle * movementY;
-        //Debug.Log("debug:" + movementX + ", " + movementY);
+        float motor = maxMotorTorque * movementX;
+        float steering = maxSteeringAngle * movementY;
+       // Debug.Log("debug:" + movementX + ", " + movementY);
 
      
         foreach (AxleInfo_es AxleInfo_es in AxleInfo_ess) {
@@ -73,5 +74,24 @@ public class SimpleEsController : MonoBehaviour {
             }
             ApplyLocalPositionToVisuals(AxleInfo_es.Wheel);
         }
+    }
+
+    IEnumerator GetSerialData(){
+
+        data_stream.Open();
+        Debug.Log("startCorutine");
+        while(running){
+            while(data_stream.BytesToRead>0){
+                receivedstring = data_stream.ReadLine();
+                if(receivedstring.Length==0) continue;
+                string[] datas = receivedstring.Split(',');
+                if(datas.Length!=2)continue;
+                float.TryParse(datas[0],out movementX);
+                float.TryParse(datas[1],out movementY);
+            }
+
+            yield return null;
+        }
+    data_stream.Close();
     }
 }
