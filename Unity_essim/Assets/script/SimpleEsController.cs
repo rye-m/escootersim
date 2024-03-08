@@ -16,10 +16,18 @@ public class SimpleEsController : MonoBehaviour {
     public float maxMotorTorque;
     public float maxSteeringAngle;
 
+    // Movement along X and Y axes.
+    private float movementX;
+    private float movementY;
+
     // Communication with Arduino
-    SerialPort data_stream = new SerialPort("/dev/cu.usbmodem21101", 115200);
+    SerialPort data_stream = new SerialPort("/dev/cu.usbmodem1101", 115200);
     public string receivedstring;
 
+    void Start()
+        {
+            data_stream.Open(); //Initiate the Serial stream
+        }
 
 
      
@@ -41,18 +49,19 @@ public class SimpleEsController : MonoBehaviour {
         visualWheel.transform.rotation = rotation;
     }
      
-    public void FixedUpdate()
+    public void Update()
     {
-        //float motor = maxMotorTorque * Input.GetAxis("Vertical");
-        //float steering = maxSteeringAngle * Input.GetAxis("Horizontal");
+        float motor = maxMotorTorque * Input.GetAxis("Vertical");
+        float steering = maxSteeringAngle * Input.GetAxis("Horizontal");
 
         receivedstring = data_stream.ReadLine();
         string[] datas = receivedstring.Split(',');
         movementX = float.Parse(datas[0]);
         movementY = float.Parse(datas[1]);
 
-        float motor = maxMotorTorque * movementX;
-        float steering = maxSteeringAngle * movementY;
+        //float motor = maxMotorTorque * movementX;
+        //float steering = maxSteeringAngle * movementY;
+        //Debug.Log("debug:" + movementX + ", " + movementY);
 
      
         foreach (AxleInfo_es AxleInfo_es in AxleInfo_ess) {
