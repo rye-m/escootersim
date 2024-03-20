@@ -13,11 +13,13 @@ var crypto = require('crypto');
 var cors = require('cors');
 var querystring = require('querystring');
 var cookieParser = require('cookie-parser');
+var bodyParser = require('body-parser')
 
 var client_id = '978e25ba8b0442adaeca418801d80593'; // your clientId
 var client_secret = 'f9d9bc4ddd8640a5bf3cd8bed05a9db7'; // Your secret
 var redirect_uri = 'http://localhost:8888/callback'; // Your redirect uri
 
+global.ACCESS_TOKEN = ''
 
 const generateRandomString = (length) => {
   return crypto
@@ -30,9 +32,39 @@ var stateKey = 'spotify_auth_state';
 
 var app = express();
 
+// create application/json parser
+var jsonParser = bodyParser.json()
+
 app.use(express.static(__dirname + '/public'))
    .use(cors())
    .use(cookieParser());
+
+app.post('/api', jsonParser, function(req, res){
+  const users = [
+    { id: 1, name: 'John Doe' },
+    { id: 2, name: 'Jane Smith' },
+  ];
+  command = req.body.command
+
+  var authOptions = {
+    url: 'https://api.spotify.com/v1/me/player/' + command,
+    headers: {
+      'content-type': 'application/json',
+      'Authorization': 'Bearer ' + global.ACCESS_TOKEN,
+    },
+    json: true
+  };
+  console.log("authOptions.url: " + authOptions.url);
+
+  request.post(authOptions, function(error, response, body) {
+    // res.json(users);  }
+    res.json(response);
+    console.log("response: " + response.statusCode);
+  }
+    // res.json(global.ACCESS_TOKEN);  }
+    )
+  }
+)
 
 app.get('/login', function(req, res) {
 
@@ -88,7 +120,10 @@ app.get('/callback', function(req, res) {
 
         var access_token = body.access_token,
             refresh_token = body.refresh_token;
+        
+        global.ACCESS_TOKEN = body.access_token
 
+        //console.log("ACCESS_TOKEN: "+ ACCESS_TOKEN);
         var options = {
           url: 'https://api.spotify.com/v1/me',
           headers: { 'Authorization': 'Bearer ' + access_token },
