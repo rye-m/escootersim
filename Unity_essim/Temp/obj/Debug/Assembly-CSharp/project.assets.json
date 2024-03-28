@@ -8,19 +8,19 @@
     ".NETStandard,Version=v2.1": []
   },
   "packageFolders": {
-    "/Users/marioyang/.nuget/packages/": {}
+    "/Users/ryem/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/marioyang/Github/escootersim/Unity_essim/Assembly-CSharp.csproj",
+      "projectUniqueName": "/Users/ryem/Desktop/Cornell_Tech/escootersim/Unity_essim/Assembly-CSharp.csproj",
       "projectName": "Assembly-CSharp",
-      "projectPath": "/Users/marioyang/Github/escootersim/Unity_essim/Assembly-CSharp.csproj",
-      "packagesPath": "/Users/marioyang/.nuget/packages/",
-      "outputPath": "/Users/marioyang/Github/escootersim/Unity_essim/Temp/obj/Debug/Assembly-CSharp/",
+      "projectPath": "/Users/ryem/Desktop/Cornell_Tech/escootersim/Unity_essim/Assembly-CSharp.csproj",
+      "packagesPath": "/Users/ryem/.nuget/packages/",
+      "outputPath": "/Users/ryem/Desktop/Cornell_Tech/escootersim/Unity_essim/Temp/obj/Debug/Assembly-CSharp/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "/Users/marioyang/.nuget/NuGet/NuGet.Config"
+        "/Users/ryem/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "netstandard2.1"
