@@ -40,10 +40,7 @@ app.use(express.static(__dirname + '/public'))
    .use(cookieParser());
 
 app.post('/api', jsonParser, function(req, res){
-  const users = [
-    { id: 1, name: 'John Doe' },
-    { id: 2, name: 'Jane Smith' },
-  ];
+
   command = req.body.command
 
   var authOptions = {
@@ -56,13 +53,17 @@ app.post('/api', jsonParser, function(req, res){
   };
   console.log("authOptions.url: " + authOptions.url);
 
-  request.post(authOptions, function(error, response, body) {
-    // res.json(users);  }
-    res.json(response);
-    console.log("response: " + response.statusCode);
+  if (command == 'next' || command == 'previous'){
+    request.post(authOptions, function(error, response, body) {
+      res.json(response.statusCode);
+      console.log("response: " + response.statusCode);
+    })
   }
-    // res.json(global.ACCESS_TOKEN);  }
-    )
+  else if (command == 'play' || command == 'pause'){
+    request.put(authOptions, function(error, response, body) {
+      res.json(response.statusCode);
+      console.log("response: " + response.statusCode);
+    })}
   }
 )
 
