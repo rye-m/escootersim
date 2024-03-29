@@ -1,9 +1,9 @@
-# "How many" Prototype Documantation
+# "How many buttons" Prototype Documantation
 
 
 | Prototype #1 |  |
 |---------------|----------------|
-| <img src="./asset/img/IMG_8482.JPG" width="300"> |  <img src="./asset/img/IMG_8483.JPG" width="300"> |
+| <img src="./asset/img/IMG_8482.JPG" width="300"> |  <img src="./asset/img/IMG_8483.JPG" width="300" > |
 | **Variable:** | number of a button  
 | **Difference from others:** | It only has a single button  |
 | **Pros:** | You only use one finger to push the button |
