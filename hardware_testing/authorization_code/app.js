@@ -63,6 +63,19 @@ app.post('/api', jsonParser, function(req, res){
     request.put(authOptions, function(error, response, body) {
       res.json(response.statusCode);
       console.log("response: " + response.statusCode);
+    })
+  }
+  else if (command == 'currently-playing'){
+    request.get(authOptions, function(error, response, body) {
+      if (response.body.is_playing == false) {
+        res.sendStatus(201);        
+          }
+      else if (response.body.is_playing == true) {
+        res.sendStatus(202);        
+      }
+      else { res.sendStatus(500); }
+      console.log("statusCode: " + response.statusCode);
+      console.log("is_playing: " + response.body.is_playing);
     })}
   }
 )
