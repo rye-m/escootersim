@@ -23,19 +23,15 @@ public class SimpleEsController : MonoBehaviour
     public float movementY;
 
     // Communication with Arduino
-    SerialPort data_stream = new SerialPort("/dev/cu.usbmodem1101", 115200);
+    SerialPort data_stream = new SerialPort("/dev/cu.usbmodem1401", 115200);
     public string receivedstring;
     public bool running = false;
     void Start()
     {
         running = true;
 
-        ListAvailablePorts();
-
-        // StartCoroutine(GetSerialData());
-
-
-        //Initiate the Serial stream
+        // ListAvailablePorts();
+        StartCoroutine(GetSerialData());
     }
 
     void OnDestroy()
@@ -71,7 +67,7 @@ public class SimpleEsController : MonoBehaviour
 
         float motor = maxMotorTorque * movementX;
         float steering = maxSteeringAngle * movementY;
-        // Debug.Log("debug:" + movementX + ", " + movementY);
+        Debug.Log("debug:" + movementX + ", " + movementY);
 
 
         foreach (AxleInfo_es AxleInfo_es in AxleInfo_ess)
@@ -100,11 +96,14 @@ public class SimpleEsController : MonoBehaviour
 
     IEnumerator GetSerialData()
     {
-
+        data_stream.RtsEnable = true;
+        data_stream.DtrEnable = true;
+        
         data_stream.Open();
         Debug.Log("startCorutine");
         while (running)
         {
+        // Debug.Log(data_stream.BytesToRead);
             while (data_stream.BytesToRead > 0)
             {
                 receivedstring = data_stream.ReadLine();
@@ -113,6 +112,7 @@ public class SimpleEsController : MonoBehaviour
                 if (datas.Length != 2) continue;
                 float.TryParse(datas[0], out movementX);
                 float.TryParse(datas[1], out movementY);
+        // Debug.Log("debug:" + movementX + ", " + movementY);
             }
 
             yield return null;
