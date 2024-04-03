@@ -19,6 +19,8 @@ public class SimpleEsController : MonoBehaviour
     public float maxSteeringAngle;
 
     // Movement along X and Y axes.
+    public float accellation;
+    public float brake;
     public float movementX;
     public float movementY;
 
@@ -67,7 +69,7 @@ public class SimpleEsController : MonoBehaviour
 
         float motor = maxMotorTorque * movementX;
         float steering = maxSteeringAngle * movementY;
-        Debug.Log("debug:" + movementX + ", " + movementY);
+        Debug.Log("debug:" + accellation + ", " + brake + ", " + movementX + ", " + movementY);
 
 
         foreach (AxleInfo_es AxleInfo_es in AxleInfo_ess)
@@ -109,9 +111,12 @@ public class SimpleEsController : MonoBehaviour
                 receivedstring = data_stream.ReadLine();
                 if (receivedstring.Length == 0) continue;
                 string[] datas = receivedstring.Split(',');
-                if (datas.Length != 2) continue;
-                float.TryParse(datas[0], out movementX);
-                float.TryParse(datas[1], out movementY);
+                if (datas.Length != 3) continue;
+                float.TryParse(datas[0], out accellation);
+                float.TryParse(datas[1], out brake);
+                float.TryParse(datas[2], out movementY);
+
+                movementX = accellation - brake;
         // Debug.Log("debug:" + movementX + ", " + movementY);
             }
 
