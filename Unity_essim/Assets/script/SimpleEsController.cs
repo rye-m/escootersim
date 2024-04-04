@@ -25,7 +25,7 @@ public class SimpleEsController : MonoBehaviour
     public float movementY;
 
     // Communication with Arduino
-    SerialPort data_stream = new SerialPort("/dev/cu.usbmodem1401", 115200);
+    SerialPort data_stream = new SerialPort("/dev/cu.usbmodem1201", 115200);
     public string receivedstring;
     public bool running = false;
     void Start()
@@ -116,7 +116,7 @@ public class SimpleEsController : MonoBehaviour
                 float.TryParse(datas[1], out brake);
                 float.TryParse(datas[2], out movementY);
 
-                movementX = accellation - brake;
+                movementX = accellation - brake > 0? accellation - brake : 0;
         // Debug.Log("debug:" + movementX + ", " + movementY);
             }
 

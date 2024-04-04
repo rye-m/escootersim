@@ -19,7 +19,7 @@ void loop() {
   Serial.print(",");
   Serial.print(map(analogRead(B_pin), 290, 690, 0, 100)/100.00);
   Serial.print(",");
-  Serial.println(0);
+  Serial.println(map(analogRead(S_pin), 260, 670, 50, -45)/100.00);
   delay(9);
 }
 
