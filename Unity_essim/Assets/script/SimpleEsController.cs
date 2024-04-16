@@ -33,7 +33,7 @@ public class SimpleEsController : MonoBehaviour
         running = true;
 
         // ListAvailablePorts();
-        StartCoroutine(GetSerialData());
+        // StartCoroutine(GetSerialData());
     }
 
     void OnDestroy()
@@ -62,13 +62,13 @@ public class SimpleEsController : MonoBehaviour
 
     public void Update()
     {
-        // float motor = maxMotorTorque * Input.GetAxis("Vertical");
-        // float steering = maxSteeringAngle * Input.GetAxis("Horizontal");
+        float motor = maxMotorTorque * Input.GetAxis("Vertical");
+        float steering = maxSteeringAngle * Input.GetAxis("Horizontal");
 
 
 
-        float motor = maxMotorTorque * movementX;
-        float steering = maxSteeringAngle * movementY;
+        // float motor = maxMotorTorque * movementX;
+        // float steering = maxSteeringAngle * movementY;
         Debug.Log("debug:" + accellation + ", " + brake + ", " + movementX + ", " + movementY);
 
 
