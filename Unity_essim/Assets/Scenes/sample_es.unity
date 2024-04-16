@@ -209,13 +209,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 620834913}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: 0.35059437, z: -0, w: 0.93652743}
-  m_LocalPosition: {x: -5.71, y: 1, z: -6.07}
+  m_LocalRotation: {x: 0.1859451, y: 0.41681173, z: -0.07490273, w: 0.8866127}
+  m_LocalPosition: {x: -9.36, y: 2.6, z: -6.68}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 41.047, z: 0}
+  m_LocalEulerAnglesHint: {x: 23.089, y: 50.64, z: 1.382}
 --- !u!114 &620834917
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -546,6 +546,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2022313592954540846, guid: 77f24d6ab17514ee5b7aef42dbe07e94,
+        type: 3}
+      propertyPath: maxMotorTorque
+      value: 500
+      objectReference: {fileID: 0}
+    - target: {fileID: 2022313592954540846, guid: 77f24d6ab17514ee5b7aef42dbe07e94,
+        type: 3}
+      propertyPath: maxSteeringAngle
+      value: 40
       objectReference: {fileID: 0}
     - target: {fileID: 3952380037266503965, guid: 77f24d6ab17514ee5b7aef42dbe07e94,
         type: 3}
