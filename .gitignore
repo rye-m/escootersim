@@ -73,3 +73,9 @@ crashlytics-build.properties
 
 # Unity cache directory
 Unity_essim/Library/PackageCache/
+
+# Large gif data
+*.gif
+
+# videos
+Videos/
