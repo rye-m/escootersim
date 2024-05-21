@@ -92,7 +92,7 @@ void spotify_button_setup(){
   //Start with the LED off
   button.LEDoff();
 
-  sendRequest("api",  "first_contact");
+  sendRequest("api",  "spotify_button_connected");
 }
 
 
