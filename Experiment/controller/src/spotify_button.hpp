@@ -1,11 +1,3 @@
-// #include <WiFi.h>
-// #include <network.h>
-// #include <setupFunc.h>
-// #include <HTTPClient.h>
-// #include <Wire.h>
-// #include "Adafruit_MPR121.h"
-// #include <SparkFun_Qwiic_Button.h>
-
 uint32_t  LastTimerTick;
 
 void ButtonState_button(){

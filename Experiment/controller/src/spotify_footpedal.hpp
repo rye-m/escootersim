@@ -1,3 +1,4 @@
+// #pragma once
 // #include <WiFi.h>
 // #include <network.h>
 // #include <others.h>

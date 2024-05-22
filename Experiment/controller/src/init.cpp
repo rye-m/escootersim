@@ -1,7 +1,7 @@
-#include <WiFi.h>
 #include <network.h>
 #include <others.h>
 #include <setupFunc.h>
+#include <WiFi.h>
 #include <HTTPClient.h>
 #include <Wire.h>
 #include "Adafruit_MPR121.h"
@@ -10,6 +10,9 @@
 #include <spotify_button.hpp>
 #include <nback_button.hpp>
 #include <spotify_footpedal.hpp>
+#include <spotify_gearshifter.hpp>
+
+
 
 int res_code = 0;
 
@@ -29,6 +32,7 @@ void setup(){
             break;
         case 203:
             Serial.println("203");
+            spotify_gearshifter_setup();
             break;
         case 204:
             Serial.println("204");
@@ -62,7 +66,7 @@ void loop() {
             spotify_footpedal_loop();
             break;
         case 203:
-            Serial.println("203");
+            spotify_gearshifter_loop();
             break;
         case 204:
             Serial.println("204");
