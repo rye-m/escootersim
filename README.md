@@ -1,6 +1,6 @@
 # escootersim  
   
-## High-Level Documentation for Each Folder #1  
+## 1. High-Level Documentation for Each Folder 
   
 
 
@@ -26,7 +26,7 @@
 │   │   ├── sketch_mar29a  
 │   │   └── unity_test  
 │   ├── circuit_playground: *don't use this folder anymore*  
-│   └── escootersim_pypico: *scripts for getting AC, BR, ST data from the escooter* 
+│   └── escootersim_pypico: *scripts for getting AC, BR, ST data from the escooter*  
 │       ├── include  
 │       ├── lib  
 │       ├── src  
@@ -36,3 +36,14 @@
 │       └── img: *GIF is git-ignored*  
 └── videos: *videos from our pilot experiment(must be git-ignored)*  
   
+
+
+## 2. Compile Instructions
+
+### 2-1. Upload code to ESP32
+
+Let's start from "3. Install PlatformIO on Visual Studio Code" in this page  https://github.com/rye-m/tiltybot_workshop/wiki/01_Prep_%E4%BA%8B%E5%89%8D%E6%BA%96%E5%82%99
+
+
+
+### 2-2. Hosting webserver in your laptop
