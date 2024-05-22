@@ -1,15 +1,19 @@
 #include "Adafruit_MPR121.h"
 #include <SparkFun_Qwiic_Button.h>
 #include <seesaw_neopixel.h>
-// #include <network.h>
 
 const int sequenceLength = 10;
 const int n = 1;
 const int timeout = 3000;
+#define  DEFAULT_I2C_ADDR 0x30
+#define  ANALOGIN   18
+#define  NEOPIXELOUT 14
+
 
 QwiicButton button;
 uint8_t brightness = 100;   //The brightness to set the LED to when the button is pushed
-                            //Can be any value between 0 (off) and 255 (max)
+Adafruit_seesaw seesaw;
+seesaw_NeoPixel pixels = seesaw_NeoPixel(4, NEOPIXELOUT, NEO_GRB + NEO_KHZ800);
 
 
 bool isPressed(int pin, int thr){
@@ -162,4 +166,17 @@ void changeColor(int status, seesaw_NeoPixel pixels) {
         pixels.show();
     }
   }
+}
+
+uint32_t Wheel(byte WheelPos) {
+  WheelPos = 255 - WheelPos;
+  if(WheelPos < 85) {
+    return seesaw_NeoPixel::Color(255 - WheelPos * 3, 0, WheelPos * 3);
+  }
+  if(WheelPos < 170) {
+    WheelPos -= 85;
+    return seesaw_NeoPixel::Color(0, WheelPos * 3, 255 - WheelPos * 3);
+  }
+  WheelPos -= 170;
+  return seesaw_NeoPixel::Color(WheelPos * 3, 255 - WheelPos * 3, 0);
 }

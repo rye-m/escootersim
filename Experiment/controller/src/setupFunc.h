@@ -1,5 +1,4 @@
 #include <WiFi.h>
-// #include <network.h>
 #include <Wire.h>
     
 
@@ -21,6 +20,5 @@ Serial.print("Local TinyPICO IP: ");
 Serial.println(WiFi.localIP());
 
 delay(1000);
-
 
 }

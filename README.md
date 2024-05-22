@@ -2,7 +2,9 @@
   
 ## High-Level Documentation for Each Folder #1  
   
-  
+
+
+
 ├── Experiment: *main folder we use for the experiment.*  
 │   ├── controller: *scripts for ESP32. Open this folder for uploading app to ESP32.*   
 │   │   ├── _old  
@@ -16,21 +18,21 @@
 │       ├── node_modules  
 │       ├── public  
 │           ├── index.html: home page  
-│           └── spotify.html: *spotyfy authorization pag*e  
-├── Unity_essim  
-├── _old  
+│           └── spotify.html: *spotyfy authorization page*  
+├── Unity_essim: *for unity environment(escooter base only)*  
+├── _old: *don't use this folder anymore*  
 ├── micon  
-│   ├── arduino  
+│   ├── arduino: *don't use this folder anymore*  
 │   │   ├── sketch_mar29a  
 │   │   └── unity_test  
-│   ├── circuit_playground  
-│   └── escootersim_pypico  
+│   ├── circuit_playground: *don't use this folder anymore*  
+│   └── escootersim_pypico: *scripts for getting AC, BR, ST data from the escooter* 
 │       ├── include  
 │       ├── lib  
 │       ├── src  
 │       └── test  
-├── prototyping  
+├── prototyping: *for documenting prototypes*  
 │   └── asset  
-│       └── img  
-└── videos  
+│       └── img: *GIF is git-ignored*  
+└── videos: *videos from our pilot experiment(must be git-ignored)*  
   
