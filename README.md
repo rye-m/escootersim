@@ -42,8 +42,13 @@
 
 ### 2-1. Upload code to ESP32
 
-Let's start from "3. Install PlatformIO on Visual Studio Code" in this page  https://github.com/rye-m/tiltybot_workshop/wiki/01_Prep_%E4%BA%8B%E5%89%8D%E6%BA%96%E5%82%99
+1. Let's start from "3. Install PlatformIO on Visual Studio Code" in this page  https://github.com/rye-m/tiltybot_workshop/wiki/01_Prep_%E4%BA%8B%E5%89%8D%E6%BA%96%E5%82%99
 
-
+2. And then, follow the instruction at https://github.com/rye-m/tiltybot_workshop/wiki/02_Instruction_%E3%83%99%E3%83%BC%E3%82%B9%E3%83%AD%E3%83%9C%E3%83%83%E3%83%88%E3%81%AE%E4%BD%9C%E3%82%8A%E6%96%B9
 
 ### 2-2. Hosting webserver in your laptop
+
+1. go to `cd escootersim/Experiment/server`  
+2. `npm init`
+3. `npm start` 
+
