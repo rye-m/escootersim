@@ -94,6 +94,32 @@ String YesOrNo_button(QwiicButton button){
 }
 
 
+String YesOrNo_gearshifter(Adafruit_seesaw seesaw){
+  uint32_t  start_time;
+  int mapped_val = map(seesaw.analogRead(ANALOGIN), 0, 1023, 1, 3);
+  Serial.println(mapped_val);
+  delay(700);
+  start_time = millis();
+  while (true) {
+      if(mapped_val == 1){ 
+          return "yes"; 
+          break;
+      }
+      if(mapped_val == 3){ 
+          return "no";
+          break;
+      }
+      else{
+          if(millis() - start_time > timeout){
+            return "timeout";
+            delay(700);
+            break;
+          } 
+      }
+  }            
+}
+
+
 void react(String answer){
     sendRequest("nback", answer);
     Serial.println(answer);
@@ -180,3 +206,50 @@ uint32_t Wheel(byte WheelPos) {
   WheelPos -= 170;
   return seesaw_NeoPixel::Color(WheelPos * 3, 255 - WheelPos * 3, 0);
 }
+
+// int previous_input = 0;
+
+
+// Function to run the N-back task
+void nBackTask(const std::vector<int>& sequence, int n, int input_type) {
+
+    int correctCount = 0;
+    String userInput;
+
+    for (int i = 0; i < sequence.size(); ++i) {
+        sendRequest("nback", String(std::to_string(sequence[i]).c_str()));
+        Serial.println("\n\"" + String(std::to_string(sequence[i]).c_str()) + "\"");
+        delay(100);
+        Serial.print("Match? -> ");
+        switch (input_type)
+        {
+        case 0: // button
+          userInput = YesOrNo_button(button);
+          break;
+        case 1: // gearshifter
+          userInput = YesOrNo_gearshifter(seesaw);
+          break;
+        // case "footpedal":
+        //   userInput = YesOrNo_button(footpedal);
+        //   break;
+        // case "throttle":
+        //   userInput = YesOrNo_button(throttle);
+        //   break;
+        
+        default:
+          break;
+        }
+
+        if (assert_result(i, sequence, userInput)) {
+            correctCount++;
+        }
+        delay(1000);
+    }
+
+    double accuracy = static_cast<double>(correctCount) / sequenceLength * 100;
+    Serial.print("Accuracy: ");
+    Serial.print(accuracy);
+    sendRequest("nback", String(accuracy, DEC));
+    sendRequest("nback",  "end");
+}
+

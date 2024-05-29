@@ -56,7 +56,11 @@ app.get('/mode_tinypico', jsonParser, function(req, res){
       console.log('Spotify_button');
       statuscode = 201;
       break;
-    case 'Spotify_footpedal':
+      case 'Spotify_foot_button':
+        console.log('Spotify_foot_button');
+        statuscode = 208;
+        break;
+      case 'Spotify_footpedal':
       console.log('Spotify_footpedal');
       statuscode = 202;
       break;
@@ -72,7 +76,11 @@ app.get('/mode_tinypico', jsonParser, function(req, res){
       console.log('Nback_button');
       statuscode = 205;
       break;
-    case 'Nback_footpedal':
+      case 'Nback_foot_button':
+        console.log('Nback_foot_button');
+        statuscode = 209;
+        break;
+      case 'Nback_footpedal':
       console.log('Nback_footpedal');
       statuscode = 206;
       break;

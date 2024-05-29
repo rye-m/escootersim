@@ -1,5 +1,5 @@
 #include <network.h>
-#include <others.h>
+#include <utils.h>
 #include <setupFunc.h>
 #include <WiFi.h>
 #include <HTTPClient.h>
@@ -9,9 +9,11 @@
 #include <seesaw_neopixel.h>
 #include <spotify_button.hpp>
 #include <nback_button.hpp>
+#include <spotify_foot_button.hpp>
+#include <nback_gearshifter.hpp>
 #include <spotify_footpedal.hpp>
 #include <spotify_gearshifter.hpp>
-
+#include <Arduino.h>
 
 
 int res_code = 0;
@@ -43,12 +45,18 @@ void setup(){
             break;
         case 206:
             Serial.println("206");
+            // nback_footpedal_setup();
             break;
         case 207:
             Serial.println("207");
+            nback_gearshifter_setup();
             break;
         case 208:
             Serial.println("208");
+            break;
+        case 209:
+            Serial.println("208");
+            spotify_foot_button_setup();
             break;
         default:
             Serial.println("default");
@@ -77,12 +85,18 @@ void loop() {
             break;
         case 206:
             Serial.println("206");
+            // nback_gearshifter_loop();
             break;
         case 207:
             Serial.println("207");
+            nback_gearshifter_loop();
             break;
         case 208:
             Serial.println("208");
+            break;
+        case 209:
+            Serial.println("209");
+            spotify_foot_button_loop();
             break;
         default:
             Serial.println("default");

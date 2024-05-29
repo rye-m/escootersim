@@ -1,21 +1,23 @@
-uint32_t  LastTimerTick;
+uint32_t  LastTimerTick_foot;
+const int input_pin = 25; // analog pin connected to X output
 
-void ButtonState_button(){
+
+void ButtonState_foot_button(){
   static int state = 0;
   uint32_t Ti;
   static uint32_t DoubleClickTick;
   
   switch(state){
     case 0:                                             // ボタン押下チェックstate
-            if(button.isPressed() == true){                   // プルアップされているので押下でL
-              LastTimerTick = millis();                 // 押下時の時間セット
+            if(! digitalRead(input_pin) == true){                   // プルアップされているので押下でL
+              LastTimerTick_foot = millis();                 // 押下時の時間セット
               state = 1;
               button.LEDon(100);
             }
             break;
     case 1:                                             // ボタン離しチェックstate
-            if(button.isPressed() != true){                   // 立ち上がりを検出
-              Ti = millis() - LastTimerTick;
+            if(! digitalRead(input_pin) != true){                   // 立ち上がりを検出
+              Ti = millis() - LastTimerTick_foot;
               button.LEDoff();
               if(Ti >= 500 ){                           // 500ms超えた？
                 Serial.println("long press: previous");          // 長押し確定
@@ -29,8 +31,8 @@ void ButtonState_button(){
             }
             break;
     case 2:                                             // ボタン押下チェックstate
-          if(button.isPressed() == true){                     // プルアップされているので押下でL
-              LastTimerTick = millis();                 // 押下時の時間セット
+          if(! digitalRead(input_pin) == true){                     // プルアップされているので押下でL
+              LastTimerTick_foot = millis();                 // 押下時の時間セット
               state = 3;
               button.LEDon(100);
             }
@@ -41,8 +43,8 @@ void ButtonState_button(){
             }
             break;
     case 3:                                             // ボタン離しチェックstate
-            if(button.isPressed() != true){                   // 立ち上がりを検出
-              Ti = millis() - LastTimerTick;
+            if(! digitalRead(input_pin) != true){                   // 立ち上がりを検出
+              Ti = millis() - LastTimerTick_foot;
               button.LEDoff();
               if(Ti >= 500 ){                           // 500ms超えた？
                 Serial.println("long press: previous");          // シングルクリック->長押し確定
@@ -68,8 +70,7 @@ void ButtonState_button(){
   }            
 }
 
-void spotify_button_setup(){
-  // init_wifi();
+void spotify_foot_button_setup(){
     
   Serial.println("Qwiic button examples");
   Wire.begin(); //Join I2C bus
@@ -88,6 +89,6 @@ void spotify_button_setup(){
 }
 
 
-void spotify_button_loop() {
-  ButtonState_button();
+void spotify_foot_button_loop() {
+  ButtonState_foot_button();
   }
