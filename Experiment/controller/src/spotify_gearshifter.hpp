@@ -1,16 +1,7 @@
-// #include <WiFi.h>
-// #include <network.h>
-// #include <others.h>
-// #include <setupFunc.h>
-// #include <HTTPClient.h>
-// #include <Wire.h>
-// #include "Adafruit_MPR121.h"
-// #include <SparkFun_Qwiic_Button.h>
-// #include <seesaw_neopixel.h>
+#include <Arduino.h>
 
 #define  DEFAULT_I2C_ADDR 0x30
 #define  ANALOGIN   18
-#define  NEOPIXELOUT 14
 
 int next_e = 60;
 int play_b = 230;
@@ -26,34 +17,11 @@ String previous_input = "pause";
 
 
 void spotify_gearshifter_setup() {
-  init_wifi();
-  
-  uint16_t pid;
-  uint8_t year, mon, day;
-
-  seesaw.getProdDatecode(&pid, &year, &mon, &day);
-  Serial.print("seesaw found PID: ");
-  Serial.print(pid);
-  Serial.print(" datecode: ");
-  Serial.print(2000+year); Serial.print("/");
-  Serial.print(mon); Serial.print("/");
-  Serial.println(day);
-
-  if (pid != 5295) {
-      Serial.println(F("Wrong seesaw PID"));
-      while (1) delay(10);
+  Wire.begin();
+  if (!seesaw.begin(DEFAULT_I2C_ADDR)) {
+    Serial.println(F("seesaw not found!"));
+    while(1) delay(10);
   }
-
-  if (!pixels.begin(DEFAULT_I2C_ADDR)){
-      Serial.println("seesaw pixels not found!");
-      while(1) delay(10);
-  }
-
-  Serial.println(F("seesaw started OK!"));
-
-  pixels.setBrightness(255);  // half bright
-  pixels.show(); // Initialize all pixels to 'off'
-
   sendRequest("api",  "spotify_gearshifter_connected");
 }
 
@@ -69,7 +37,7 @@ void spotify_gearshifter_loop() {
             Serial.println("next");
             sendRequest("api",  "next");
             previous_input = "next";
-    }
+    } 
     else if (play_b < slide_val && slide_val <= play_e){
             sendRequest("api",  "play");
             Serial.println("play");
@@ -86,10 +54,6 @@ void spotify_gearshifter_loop() {
             previous_input = "previous";
     }
 
-    for (uint8_t i=0; i< pixels.numPixels(); i++) {
-        pixels.setPixelColor(i, Wheel(slide_val / 4));
-        }
-        pixels.show();
   
   delay(50);
 }
