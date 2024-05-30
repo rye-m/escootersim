@@ -58,7 +58,7 @@ app.get('/mode_tinypico', jsonParser, function(req, res){
       break;
       case 'Spotify_foot_button':
         console.log('Spotify_foot_button');
-        statuscode = 208;
+        statuscode = 209;
         break;
       case 'Spotify_footpedal':
       console.log('Spotify_footpedal');
@@ -78,7 +78,7 @@ app.get('/mode_tinypico', jsonParser, function(req, res){
       break;
       case 'Nback_foot_button':
         console.log('Nback_foot_button');
-        statuscode = 209;
+        statuscode = 210;
         break;
       case 'Nback_footpedal':
       console.log('Nback_footpedal');
@@ -147,15 +147,21 @@ app.post('/api', jsonParser, function(req, res){
   }
   else if (command == 'currently-playing'){
     request.get(authOptions, function(error, response, body) {
-      if (response.body.is_playing == false) {
-        res.sendStatus(201);        
-          }
-      else if (response.body.is_playing == true) {
-        res.sendStatus(202);        
+      try {
+        if (response.body.is_playing == false) {
+          res.sendStatus(201);        
+            }
+        else if (response.body.is_playing == true) {
+          res.sendStatus(202);        
+        }
+        else { res.sendStatus(500); }
+        console.log("statusCode: " + response.statusCode);
+        console.log("is_playing: " + response.body.is_playing);
       }
-      else { res.sendStatus(500); }
-      console.log("statusCode: " + response.statusCode);
-      console.log("is_playing: " + response.body.is_playing);
+      catch(e) {
+        console.log(e);
+        console.log("Error: " + e);
+    }
     })}
   }
 )

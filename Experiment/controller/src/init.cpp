@@ -13,6 +13,7 @@
 #include <nback_gearshifter.hpp>
 #include <spotify_footpedal.hpp>
 #include <spotify_gearshifter.hpp>
+#include <spotify_throttle.hpp>
 #include <Arduino.h>
 
 
@@ -38,6 +39,7 @@ void setup(){
             break;
         case 204:
             Serial.println("204");
+            spotify_throttle_setup();
             break;
         case 205:
             Serial.println("205");
@@ -55,7 +57,7 @@ void setup(){
             Serial.println("208");
             break;
         case 209:
-            Serial.println("208");
+            Serial.println("209");
             spotify_foot_button_setup();
             break;
         default:
@@ -77,7 +79,7 @@ void loop() {
             spotify_gearshifter_loop();
             break;
         case 204:
-            Serial.println("204");
+            spotify_throttle_loop();
             break;
         case 205:
             Serial.println("205");
@@ -95,7 +97,6 @@ void loop() {
             Serial.println("208");
             break;
         case 209:
-            Serial.println("209");
             spotify_foot_button_loop();
             break;
         default:
