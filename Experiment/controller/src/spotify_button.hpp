@@ -7,14 +7,14 @@ void ButtonState_button(){
   
   switch(state){
     case 0:                                             // ボタン押下チェックstate
-            if(button.isPressed() == true){                   // プルアップされているので押下でL
+            if(button.isPressed()){                   // プルアップされているので押下でL
               LastTimerTick = millis();                 // 押下時の時間セット
               state = 1;
               button.LEDon(100);
             }
             break;
     case 1:                                             // ボタン離しチェックstate
-            if(button.isPressed() != true){                   // 立ち上がりを検出
+            if(! button.isPressed()){                   // 立ち上がりを検出
               Ti = millis() - LastTimerTick;
               button.LEDoff();
               if(Ti >= 500 ){                           // 500ms超えた？
@@ -29,7 +29,7 @@ void ButtonState_button(){
             }
             break;
     case 2:                                             // ボタン押下チェックstate
-          if(button.isPressed() == true){                     // プルアップされているので押下でL
+          if(button.isPressed()){                     // プルアップされているので押下でL
               LastTimerTick = millis();                 // 押下時の時間セット
               state = 3;
               button.LEDon(100);
@@ -41,7 +41,7 @@ void ButtonState_button(){
             }
             break;
     case 3:                                             // ボタン離しチェックstate
-            if(button.isPressed() != true){                   // 立ち上がりを検出
+            if(! button.isPressed()){                   // 立ち上がりを検出
               Ti = millis() - LastTimerTick;
               button.LEDoff();
               if(Ti >= 500 ){                           // 500ms超えた？
@@ -56,7 +56,8 @@ void ButtonState_button(){
                   sendRequest("api",  "next");
                   state = 0;
                 } else {
-                  Serial.println("2:click!");           // 
+                  Serial.println("click: play/puase");           // 
+                  playOrPause();
                   state = 0;                  
               }
             }
@@ -69,7 +70,6 @@ void ButtonState_button(){
 }
 
 void spotify_button_setup(){
-  // init_wifi();
     
   Serial.println("Qwiic button examples");
   Wire.begin(); //Join I2C bus

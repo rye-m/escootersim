@@ -64,7 +64,8 @@ void ButtonState_footpedal(){
                   sendRequest("api",  "next");
                   state = 0;
                 } else {
-                  Serial.println("2:click!");           // 
+                  Serial.println("click: play/puase");           // 
+                  playOrPause();
                   state = 0;                  
               }
             }
