@@ -1,10 +1,19 @@
 #include "Adafruit_MPR121.h"
 #include <SparkFun_Qwiic_Button.h>
 #include <seesaw_neopixel.h>
+// #include <Adafruit_TestBed.h>
+// extern Adafruit_TestBed TB;
+
+#define SECONDARY_I2C_PORT &Wire1
+
 
 const int sequenceLength = 10;
 const int n = 1;
 const int timeout = 3000;
+const int foot_button_pin = A1; // analog pin connected to X output
+const int throttle_pin = A2; // analog pin connected to X output
+const int throttle_th = 2900; // thrashhold for the potentiometer of the throttle
+
 #define  DEFAULT_I2C_ADDR 0x30
 #define  ANALOGIN   18
 #define  NEOPIXELOUT 14
@@ -15,9 +24,56 @@ uint8_t brightness = 100;   //The brightness to set the LED to when the button i
 Adafruit_seesaw seesaw;
 seesaw_NeoPixel pixels = seesaw_NeoPixel(4, NEOPIXELOUT, NEO_GRB + NEO_KHZ800);
 
+void I2C_setup_for_PyQT(){
+
+  #if defined(ARDUINO_ADAFRUIT_QTPY_ESP32S2) || \
+      defined(ARDUINO_ADAFRUIT_QTPY_ESP32S3_NOPSRAM) || \
+      defined(ARDUINO_ADAFRUIT_QTPY_ESP32S3) || \
+      defined(ARDUINO_ADAFRUIT_QTPY_ESP32_PICO)
+    // ESP32 is kinda odd in that secondary ports must be manually
+    // assigned their pins with setPins()!
+    Wire1.setPins(SDA1, SCL1);
+  #endif
+
+  #if defined(ARDUINO_ADAFRUIT_FEATHER_ESP32S2)
+    // turn on the I2C power by setting pin to opposite of 'rest state'
+    pinMode(PIN_I2C_POWER, INPUT);
+    delay(1);
+    bool polarity = digitalRead(PIN_I2C_POWER);
+    pinMode(PIN_I2C_POWER, OUTPUT);
+    digitalWrite(PIN_I2C_POWER, !polarity);
+  #endif
+
+  #if defined(ARDUINO_ADAFRUIT_FEATHER_ESP32S2_TFT)
+    pinMode(TFT_I2C_POWER, OUTPUT);
+    digitalWrite(TFT_I2C_POWER, HIGH);
+  #endif
+
+  #if defined(ARDUINO_ADAFRUIT_FEATHER_ESP32S2_REVTFT)
+    pinMode(TFT_I2C_POWER, OUTPUT);
+    digitalWrite(TFT_I2C_POWER, HIGH);
+  #endif
+
+  #if defined(ADAFRUIT_FEATHER_ESP32_V2)
+    // Turn on the I2C power by pulling pin HIGH.
+    pinMode(NEOPIXEL_I2C_POWER, OUTPUT);
+    digitalWrite(NEOPIXEL_I2C_POWER, HIGH);
+  #endif
+
+}
+
 
 bool isPressed(int pin, int thr){
-  int deg = analogRead(pin);
+
+  int deg;
+  
+  if (thr == throttle_th){
+    deg = map(analogRead(pin), 2530, 8191, 850, 3100);
+    Serial.println(deg);
+  }
+  else {
+    deg = analogRead(pin);
+  }
   if (deg > thr) {
     return true;
   }
@@ -93,6 +149,38 @@ String YesOrNo_button(QwiicButton button){
   }            
 }
 
+String YesOrNo_foot_button(int foot_button_pin){
+  uint32_t  start_time;
+  uint32_t  start_time_pressed;
+  uint32_t  diff;
+
+  start_time = millis();
+  while (true) {
+      if(! digitalRead(foot_button_pin)){  
+          start_time_pressed = millis();
+          while (! digitalRead(foot_button_pin)){
+            // Serial.print(".");
+          }
+          diff = millis() - start_time_pressed;
+          if(diff <= 500){
+              Serial.println("no");
+              return "no";
+          }
+          else{
+              Serial.println("yes");
+              return "yes";
+          }
+          break;
+      }
+      else{
+          if(millis() - start_time > timeout){
+            return "timeout";
+            break;
+          } 
+      }
+  }            
+}
+
 
 String YesOrNo_gearshifter(Adafruit_seesaw seesaw){
   uint32_t  start_time;
@@ -118,6 +206,42 @@ String YesOrNo_gearshifter(Adafruit_seesaw seesaw){
       }
   }            
 }
+
+
+String YesOrNo_throttle(int throttle_pin){
+  uint32_t  start_time;
+  uint32_t  start_time_pressed;
+  uint32_t  diff;
+
+  start_time = millis();
+  while (true) {
+      if(isPressed(throttle_pin, throttle_th)){  
+          start_time_pressed = millis();
+          button.LEDon(100);
+          while (isPressed(throttle_pin, throttle_th)){
+            // Serial.print(".");
+          }
+          button.LEDoff();
+          diff = millis() - start_time_pressed;
+          if(diff <= 500){
+              Serial.println("no");
+              return "no";
+          }
+          else{
+              Serial.println("yes");
+              return "yes";
+          }
+          break;
+      }
+      else{
+          if(millis() - start_time > timeout){
+            return "timeout";
+            break;
+          } 
+      }
+  }            
+}
+
 
 
 void react(String answer){
@@ -207,8 +331,6 @@ uint32_t Wheel(byte WheelPos) {
   return seesaw_NeoPixel::Color(WheelPos * 3, 255 - WheelPos * 3, 0);
 }
 
-// int previous_input = 0;
-
 
 // Function to run the N-back task
 void nBackTask(const std::vector<int>& sequence, int n, int input_type) {
@@ -229,12 +351,12 @@ void nBackTask(const std::vector<int>& sequence, int n, int input_type) {
         case 1: // gearshifter
           userInput = YesOrNo_gearshifter(seesaw);
           break;
-        // case "footpedal":
-        //   userInput = YesOrNo_button(footpedal);
-        //   break;
-        // case "throttle":
-        //   userInput = YesOrNo_button(throttle);
-        //   break;
+        case 3:
+          userInput = YesOrNo_foot_button(foot_button_pin);
+          break;
+        case 4:
+          userInput = YesOrNo_throttle(throttle_pin);
+          break;
         
         default:
           break;

@@ -10,10 +10,12 @@
 #include <spotify_button.hpp>
 #include <nback_button.hpp>
 #include <spotify_foot_button.hpp>
-#include <nback_gearshifter.hpp>
+#include <nback_foot_button.hpp>
 #include <spotify_footpedal.hpp>
 #include <spotify_gearshifter.hpp>
+#include <nback_gearshifter.hpp>
 #include <spotify_throttle.hpp>
+#include <nback_throttle.hpp>
 #include <Arduino.h>
 
 
@@ -26,23 +28,23 @@ void setup(){
     Serial.println(res_code);
     switch(res_code) {
         case 201:
-            Serial.println("201");
+            Serial.println("spotify_button_setup");
             spotify_button_setup();
             break;
         case 202:
-            Serial.println("202");
+            Serial.println("spotify_footpedal_setup");
             spotify_footpedal_setup();
             break;
         case 203:
-            Serial.println("203");
+            Serial.println("spotify_gearshifter_setup");
             spotify_gearshifter_setup();
             break;
         case 204:
-            Serial.println("204");
+            Serial.println("spotify_throttle_setup");
             spotify_throttle_setup();
             break;
         case 205:
-            Serial.println("205");
+            Serial.println("nback_button_setup");
             nback_button_setup();
             break;
         case 206:
@@ -55,10 +57,15 @@ void setup(){
             break;
         case 208:
             Serial.println("208");
+            nback_throttle_setup();
             break;
         case 209:
-            Serial.println("209");
+            Serial.println("spotify_foot_button_setup");
             spotify_foot_button_setup();
+            break;
+        case 210:
+            Serial.println("nback_foot_button_setup");
+            nback_foot_button_setup();
             break;
         default:
             Serial.println("default");
@@ -94,10 +101,13 @@ void loop() {
             nback_gearshifter_loop();
             break;
         case 208:
-            Serial.println("208");
+            nback_throttle_loop();
             break;
         case 209:
             spotify_foot_button_loop();
+            break;
+        case 210:
+            nback_foot_button_loop();
             break;
         default:
             Serial.println("default");

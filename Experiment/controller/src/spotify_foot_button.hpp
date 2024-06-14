@@ -1,12 +1,6 @@
-#include <Adafruit_NeoPixel.h>
+// #include <Adafruit_NeoPixel.h>
 
-// How many internal neopixels do we have? some boards have more than one!
-// #define NUMPIXELS        1
-// #define NUMPIXELS        1
-
-// Adafruit_NeoPixel neopixels(NUMPIXELS, PIN_NEOPIXEL, NEO_GRB + NEO_KHZ800);
 uint32_t  LastTimerTick_foot;
-const int input_pin = 23; // analog pin connected to X output
 
 
 void ButtonState_foot_button(){
@@ -16,13 +10,13 @@ void ButtonState_foot_button(){
   
   switch(state){
     case 0:                                             // ボタン押下チェックstate
-            if(! digitalRead(input_pin)){                   // プルアップされているので押下でL
+            if(! digitalRead(foot_button_pin)){                   // プルアップされているので押下でL
               LastTimerTick_foot = millis();                 // 押下時の時間セット
               state = 1;
             }
             break;
     case 1:                                             // ボタン離しチェックstate
-            if(digitalRead(input_pin)){                   // 立ち上がりを検出
+            if(digitalRead(foot_button_pin)){                   // 立ち上がりを検出
               Ti = millis() - LastTimerTick_foot;
               if(Ti >= 500 ){                           // 500ms超えた？
                 Serial.println("long press: previous");          // 長押し確定
@@ -36,7 +30,7 @@ void ButtonState_foot_button(){
             }
             break;
     case 2:                                             // ボタン押下チェックstate
-          if(! digitalRead(input_pin)){                     // プルアップされているので押下でL
+          if(! digitalRead(foot_button_pin)){                     // プルアップされているので押下でL
               LastTimerTick_foot = millis();                 // 押下時の時間セット
               state = 3;
             }
@@ -47,7 +41,7 @@ void ButtonState_foot_button(){
             }
             break;
     case 3:                                             // ボタン離しチェックstate
-            if(digitalRead(input_pin)){                   // 立ち上がりを検出
+            if(digitalRead(foot_button_pin)){                   // 立ち上がりを検出
               Ti = millis() - LastTimerTick_foot;
               if(Ti >= 500 ){                           // 500ms超えた？
                 Serial.println("long press: previous");          // シングルクリック->長押し確定
@@ -75,22 +69,12 @@ void ButtonState_foot_button(){
 }
 
 void spotify_foot_button_setup(){
-  Serial.begin(112000);
-  pinMode(input_pin, INPUT_PULLUP);  // set our pin to an input with a pullup resistor
+  // Serial.begin(112000);
+  pinMode(foot_button_pin, INPUT_PULLUP);  // set our pin to an input with a pullup resistor
 
-  if (digitalRead(input_pin)) {
+  if (digitalRead(foot_button_pin)) {
     Serial.println("Device acknowledged.");
   }
-//   #if defined(NEOPIXEL_POWER)
-//   // If this board has a power control pin, we must set it to output and high
-//   // in order to enable the NeoPixels. We put this in an #if defined so it can
-//   // be reused for other boards without compilation errors
-//   pinMode(NEOPIXEL_POWER, OUTPUT);
-//   digitalWrite(NEOPIXEL_POWER, HIGH);
-// #endif
-
-//   neopixels.begin(); // INITIALIZE NeoPixel strip object (REQUIRED)
-//   neopixels.setBrightness(20); // not so bright
 
   sendRequest("api",  "spotify_button_connected");
 }
