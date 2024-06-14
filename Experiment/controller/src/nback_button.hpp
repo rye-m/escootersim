@@ -1,5 +1,4 @@
 void nback_button_setup(){
-  init_wifi();
 
   Serial.println("Qwiic button examples");
   Wire.begin(); //Join I2C bus

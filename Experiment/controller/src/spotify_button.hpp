@@ -70,10 +70,11 @@ void ButtonState_button(){
 }
 
 void spotify_button_setup(){
-    
-  Serial.println("Qwiic button examples");
-  Wire.begin(); //Join I2C bus
+  
+  // Wire1.setPins(SDA1, SCL1);
 
+  // I2C_setup_for_PyQT() 
+  Wire.begin(); // TinyPico only
   //check if button will acknowledge over I2C
   if (button.begin() == false) {
     Serial.println("Device did not acknowledge! Freezing.");

@@ -1,35 +1,38 @@
-#include <network.h>
-#include <utils.h>
-#include <setupFunc.h>
-#include <WiFi.h>
-#include <HTTPClient.h>
-#include <Wire.h>
-#include "Adafruit_MPR121.h"
-#include <SparkFun_Qwiic_Button.h>
-#include <seesaw_neopixel.h>
-#include <spotify_button.hpp>
-#include <nback_button.hpp>
-#include <spotify_foot_button.hpp>
-#include <nback_gearshifter.hpp>
-#include <spotify_footpedal.hpp>
-#include <spotify_gearshifter.hpp>
 #include <Arduino.h>
+#include <Adafruit_TestBed.h>
+extern Adafruit_TestBed TB;
 
-const int A1 = 32; // analog pin connected to X output
+#define DEFAULT_I2C_PORT &Wire
+
+// Some boards have TWO I2C ports, how nifty. We should scan both
+  #define SECONDARY_I2C_PORT &Wire1
 
 void setup() {
-  Serial.begin(112000);
-  pinMode(A1, INPUT);  // set our pin to an input with a pullup resistor
+  Serial.begin(115200);
+
+  // Wait for Serial port to open
+  while (!Serial) {
+    delay(10);
+  }
+  delay(500);
+  Serial.println("Adafruit I2C Scanner");
+
+  Wire1.setPins(SDA1, SCL1);
 }
 
 void loop() {
-    Serial.println(analogRead(A1));// do something like blink pin 13 LED, or whatever
-    delay(200);
-  // read the state of the pushbutton value - if not activated low then loop
-//   if( ! digitalRead(A1) ) {
-//     Serial.println(digitalRead(A1));// do something like blink pin 13 LED, or whatever
-//   }
-//   else {
-//     Serial.println(".");// do something like blink pin 13 LED, or whatever
-//   }
+  Serial.println("");
+  Serial.println("");
+
+  Serial.print("Default port (Wire) ");
+  TB.theWire = DEFAULT_I2C_PORT;
+  TB.printI2CBusScan();
+
+#if defined(SECONDARY_I2C_PORT)
+  Serial.print("Secondary port (Wire1) ");
+  TB.theWire = SECONDARY_I2C_PORT;
+  TB.printI2CBusScan();
+#endif
+
+  delay(3000); // wait 3 seconds
 }
