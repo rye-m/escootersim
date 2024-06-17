@@ -1,0 +1,35 @@
+body {
+    text-align: center;
+}
+
+button{
+    width: 100px;
+    height:100px;
+    background: #ff4242;
+    padding: 15px;
+    color:#fff;
+    border: none;
+    border-radius: 50%;
+    box-shadow: 0px 8px rgba(158,49,49,1);
+    outline: none;
+    font-size: 20px;
+    position: relative;
+    user-select: none;
+}
+
+button:active{
+    top: 8px;
+    box-shadow: none;
+    animation-name: fill;
+    animation-duration: 2s;
+    animation-delay: 0.2s;
+    }
+
+@keyframes fill{
+    from { 
+        box-shadow: 0 0 #ff4242;
+    }
+    to{
+        box-shadow: 0 0 0 999px #ff4242;
+    }
+}

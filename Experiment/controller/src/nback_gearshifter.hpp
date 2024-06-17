@@ -1,14 +1,3 @@
-// #include <WiFi.h>
-// #include <network.h>
-// #include <others.h>
-// #include <setupFunc.h>
-// #include <HTTPClient.h>
-// #include <Wire.h>
-// #include "Adafruit_MPR121.h"
-// #include <SparkFun_Qwiic_Button.h>
-// #include <seesaw_neopixel.h>
-// #include <audiono.h>
-
 #define  DEFAULT_I2C_ADDR 0x30
 #define  ANALOGIN   18
 
