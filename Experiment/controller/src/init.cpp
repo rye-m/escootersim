@@ -110,7 +110,7 @@ void loop() {
             nback_foot_button_loop();
             break;
         default:
-            Serial.println("default");
+            Serial.println(res_code);
             break;
         }
     }

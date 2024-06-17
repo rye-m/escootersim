@@ -29,7 +29,7 @@ void spotify_gearshifter_setup() {
 void spotify_gearshifter_loop() {
   // read the potentiometer
   uint16_t slide_val = seesaw.analogRead(ANALOGIN);
-//   int mapped_val = map(seesaw.analogRead(ANALOGIN), 0, 1023, 1, 1000);
+//   int mapped_val = map(seesaw.analogRead(cxcANALOGIN), 0, 1023, 1, 1000);
 
 
     Serial.println(slide_val);

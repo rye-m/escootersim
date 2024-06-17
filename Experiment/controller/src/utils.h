@@ -69,7 +69,7 @@ bool isPressed(int pin, int thr){
   
   if (thr == throttle_th){
     deg = map(analogRead(pin), 2530, 8191, 850, 3100);
-    Serial.println(deg);
+    // Serial.println(deg);
   }
   else {
     deg = analogRead(pin);
@@ -217,11 +217,9 @@ String YesOrNo_throttle(int throttle_pin){
   while (true) {
       if(isPressed(throttle_pin, throttle_th)){  
           start_time_pressed = millis();
-          button.LEDon(100);
           while (isPressed(throttle_pin, throttle_th)){
             // Serial.print(".");
           }
-          button.LEDoff();
           diff = millis() - start_time_pressed;
           if(diff <= 500){
               Serial.println("no");
@@ -341,7 +339,7 @@ void nBackTask(const std::vector<int>& sequence, int n, int input_type) {
     for (int i = 0; i < sequence.size(); ++i) {
         sendRequest("nback", String(std::to_string(sequence[i]).c_str()));
         Serial.println("\n\"" + String(std::to_string(sequence[i]).c_str()) + "\"");
-        delay(100);
+        delay(200);
         Serial.print("Match? -> ");
         switch (input_type)
         {
