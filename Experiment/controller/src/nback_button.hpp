@@ -1,10 +1,10 @@
 void nback_button_setup(){
 
   Serial.println("Qwiic button examples");
-  Wire.begin(); //Join I2C bus
+  Wire1.begin(); //Join I2C bus
 
   //check if button will acknowledge over I2C
-  if (button.begin() == false) {
+  if (button.begin(0x6F, Wire1) == false) {
     Serial.println("Device did not acknowledge! Freezing.");
     while (1);
   }

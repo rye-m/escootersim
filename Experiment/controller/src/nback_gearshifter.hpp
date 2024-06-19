@@ -3,8 +3,8 @@
 
 
 void nback_gearshifter_setup(){  
-  Wire.begin();
-  if (!seesaw.begin(DEFAULT_I2C_ADDR)) {
+  Wire1.begin();
+  if (!seesaw.begin()) {
     Serial.println(F("seesaw not found!"));
     while(1) delay(10);
   }
@@ -13,9 +13,8 @@ void nback_gearshifter_setup(){
 
 
 void nback_gearshifter_loop() {
-    int mapped_val = map(seesaw.analogRead(ANALOGIN), 0, 1023, 1, 3);
-    Serial.println(mapped_val);
-    if(mapped_val == 1){
+    int shift_no = read_gearshifter()
+    if(shift_no == 1){
       sendRequest("nback",  "begin");
       delay(2000);
       std::vector<int> sequence = generateRandomSequence(sequenceLength);

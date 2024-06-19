@@ -17,7 +17,7 @@ String previous_input = "pause";
 
 
 void spotify_gearshifter_setup() {
-  Wire.begin();
+  Wire1.begin();
   if (!seesaw.begin(DEFAULT_I2C_ADDR)) {
     Serial.println(F("seesaw not found!"));
     while(1) delay(10);
