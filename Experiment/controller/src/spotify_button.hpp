@@ -74,9 +74,9 @@ void spotify_button_setup(){
   // Wire1.setPins(SDA1, SCL1);
 
   // I2C_setup_for_PyQT() 
-  Wire.begin(); // TinyPico only
+  Wire1.begin(); // TinyPico only
   //check if button will acknowledge over I2C
-  if (button.begin() == false) {
+  if (button.begin(0x6F, Wire1) == false) {
     Serial.println("Device did not acknowledge! Freezing.");
     while (1);
   }

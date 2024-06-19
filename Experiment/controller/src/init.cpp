@@ -67,6 +67,10 @@ void setup(){
             Serial.println("nback_foot_button_setup");
             nback_foot_button_setup();
             break;
+        case 211:
+            Serial.println("nback_watch_setup");
+            nback_watch_setup();
+            break;
         default:
             Serial.println("default");
             break;
@@ -89,7 +93,6 @@ void loop() {
             spotify_throttle_loop();
             break;
         case 205:
-            Serial.println("205");
             nback_button_loop();
             break;
         case 206:
@@ -108,6 +111,9 @@ void loop() {
             break;
         case 210:
             nback_foot_button_loop();
+            break;
+        case 211:
+            nback_watch_loop();
             break;
         default:
             Serial.println(res_code);

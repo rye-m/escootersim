@@ -40,7 +40,7 @@ int sendRequest(String path, String command) {
   // Conect to the WiFi
   HTTPClient http;
 
-  String serverPath = "http://" + ipaddress + ":8888/" + path;
+  String serverPath = "http://" + ipaddress + ":8888/" + path + "/" + command;
   Serial.print("URL: ");  Serial.print(serverPath);
   Serial.print(",\tcommand: ");  Serial.println(command);
   // Your Domain name with URL path or IP address with path
@@ -50,13 +50,13 @@ int sendRequest(String path, String command) {
   //http.setAuthorization("REPLACE_WITH_SERVER_USERNAME", "REPLACE_WITH_SERVER_PASSWORD");
   
   // Specify content-type header
-  http.addHeader("Content-Type", "application/json");
+  // http.addHeader("Content-Type", "application/json");
 
   // Data to send with HTTP POST
-  String httpRequestData = "{\"command\":\"" + command + "\"}";
+  // String httpRequestData = "{\"command\":\"" + command + "\"}";
 
   // Send HTTP POST request
-  int httpResponseCode = http.POST(httpRequestData);
+  int httpResponseCode = http.GET();
   
   if (httpResponseCode == 200) {
     Serial.print("HTTP Response code: "); Serial.println(httpResponseCode);
