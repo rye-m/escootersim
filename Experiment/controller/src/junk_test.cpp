@@ -1,22 +1,22 @@
 /*
- * WebSocketClient.ino
+ * WebSocketServer.ino
  *
- *  Created on: 24.05.2015
+ *  Created on: 22.05.2015
  *
  */
 
 #include <Arduino.h>
-#include <Wire.h>
 
 #include <WiFi.h>
 #include <WiFiMulti.h>
 #include <WiFiClientSecure.h>
+#include <Wire.h>
 
-#include <WebSocketsClient.h>
 
+#include <WebSocketsServer.h>
 
 WiFiMulti WiFiMulti;
-WebSocketsClient webSocket;
+WebSocketsServer webSocket = WebSocketsServer(81);
 
 #define USE_SERIAL Serial
 
@@ -33,79 +33,81 @@ void hexdump(const void *mem, uint32_t len, uint8_t cols = 16) {
 	USE_SERIAL.printf("\n");
 }
 
-void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
+void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length) {
+    USE_SERIAL.println("test2");
 
-	switch(type) {
-		case WStype_DISCONNECTED:
-			USE_SERIAL.printf("[WSc] Disconnected!\n");
-			break;
-		case WStype_CONNECTED:
-			USE_SERIAL.printf("[WSc] Connected to url: %s\n", payload);
+    switch(type) {
+        case WStype_DISCONNECTED:
+            USE_SERIAL.printf("[%u] Disconnected!\n", num);
+            break;
+        case WStype_CONNECTED:
+            {
+                IPAddress ip = webSocket.remoteIP(num);
+                USE_SERIAL.printf("[%u] Connected from %d.%d.%d.%d url: %s\n", num, ip[0], ip[1], ip[2], ip[3], payload);
 
-			// send message to server when Connected
-			webSocket.sendTXT("Connected");
-			break;
-		case WStype_TEXT:
-			USE_SERIAL.printf("[WSc] get text: %s\n", payload);
+				// send message to client
+				webSocket.sendTXT(num, "Connected");
+            }
+            break;
+        case WStype_TEXT:
+            USE_SERIAL.printf("[%u] get Text: %s\n", num, payload);
 
-			// send message to server
-			// webSocket.sendTXT("message here");
-			break;
-		case WStype_BIN:
-			USE_SERIAL.printf("[WSc] get binary length: %u\n", length);
-			hexdump(payload, length);
+            // send message to client
+            // webSocket.sendTXT(num, "message here");
 
-			// send data to server
-			// webSocket.sendBIN(payload, length);
-			break;
+            // send data to all connected clients
+            // webSocket.broadcastTXT("message here");
+            break;
+        case WStype_BIN:
+            USE_SERIAL.printf("[%u] get binary length: %u\n", num, length);
+            hexdump(payload, length);
+
+            // send message to client
+            // webSocket.sendBIN(num, payload, length);
+            break;
 		case WStype_ERROR:			
 		case WStype_FRAGMENT_TEXT_START:
 		case WStype_FRAGMENT_BIN_START:
 		case WStype_FRAGMENT:
 		case WStype_FRAGMENT_FIN:
 			break;
-	}
+    }
 
 }
 
 void setup() {
-	// USE_SERIAL.begin(921600);
-	USE_SERIAL.begin(115200);
+    // USE_SERIAL.begin(921600);
+    USE_SERIAL.begin(115200);
+    delay(2000);
 
-	//Serial.setDebugOutput(true);
-	USE_SERIAL.setDebugOutput(true);
 
-	USE_SERIAL.println();
-	USE_SERIAL.println();
-	USE_SERIAL.println();
-  delay(3000);
-	for(uint8_t t = 4; t > 0; t--) {
-		USE_SERIAL.printf("[SETUP] BOOT WAIT %d...\n", t);
-		USE_SERIAL.flush();
-		delay(1000);
-	}
+    //Serial.setDebugOutput(true);
+    USE_SERIAL.setDebugOutput(true);
 
-	WiFiMulti.addAP("deviceFarm", "device@theFarm");
+    USE_SERIAL.println();
+    USE_SERIAL.println();
+    USE_SERIAL.println();
 
-	//WiFi.disconnect();
-	while(WiFiMulti.run() != WL_CONNECTED) {
-		delay(100);
-	}
+    for(uint8_t t = 4; t > 0; t--) {
+        USE_SERIAL.printf("[SETUP] BOOT WAIT %d...\n", t);
+        USE_SERIAL.flush();
+        delay(1000);
+    }
 
-	// server address, port and URL
-	webSocket.begin("192.168.1.103", 3000, "/echo");
+    WiFiMulti.addAP("WhiteSky-PublicWiFi", "");
 
-	// event handler
-	webSocket.onEvent(webSocketEvent);
+    while(WiFiMulti.run() != WL_CONNECTED) {
+        delay(100);
+    }
+    
+    USE_SERIAL.print("IP address: ");
+    USE_SERIAL.println(WiFi.localIP());
 
-	// use HTTP Basic Authorization this is optional remove if not needed
-	// webSocket.setAuthorization("user", "Password");
 
-	// try ever 5000 again if connection has failed
-	webSocket.setReconnectInterval(5000);
-
+    webSocket.begin();
+    webSocket.onEvent(webSocketEvent);
 }
 
 void loop() {
-	webSocket.loop();
+    webSocket.loop();
 }
