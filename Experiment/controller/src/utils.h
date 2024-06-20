@@ -22,6 +22,7 @@ String flg;
 int shifter_no;
 int data[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 int new_data[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+int previous_shift_no = 99;
 
 int one_up_bgn = 910;
 int one_up_end = 926;
@@ -53,23 +54,8 @@ Adafruit_seesaw seesaw(&Wire1);
 seesaw_NeoPixel pixels = seesaw_NeoPixel(4, NEOPIXELOUT, NEO_GRB + NEO_KHZ800);
 
 
-void setup() {
-  Serial.begin(115200);
-  Serial.println("Qwiic button examples");
-  Wire.begin(); //Join I2C bus
-
-  //check if button will acknowledge over I2C
-  if (button.begin() == false) {
-    Serial.println("Device did not acknowledge! Freezing.");
-    while (1);
-  }
-  Serial.println("Button acknowledged.");
-
-  //Start with the LED off
-  button.LEDoff();
-
-
-  Wire.begin();
+void gearshifter_setup() {
+  Wire1.begin();
   if (!seesaw.begin(DEFAULT_I2C_ADDR)) {
     Serial.println(F("seesaw not found!"));
     while(1) delay(10);
@@ -116,7 +102,7 @@ int read_gearshifter() {
   for (int i = 0; i < 10; i++){
       data[i] = new_data[i];
   }
-  return shifter_no
+  return shifter_no;
 }
 
 
@@ -241,17 +227,21 @@ String YesOrNo_foot_button(int foot_button_pin){
 
 
 String YesOrNo_gearshifter(Adafruit_seesaw seesaw){
-  uint32_t  start_time;
-  int mapped_val = map(seesaw.analogRead(ANALOGIN), 0, 1023, 1, 3);
-  Serial.println(mapped_val);
-  delay(700);
-  start_time = millis();
+  uint32_t  start_time = millis();
+  int yn_previous_shift_no = 2;
+
   while (true) {
-      if(mapped_val == 1){ 
+    int yn_shift_no = read_gearshifter();
+
+    if(yn_shift_no == yn_previous_shift_no){
+      yn_previous_shift_no = yn_shift_no;
+    }
+    else if(yn_shift_no != yn_previous_shift_no){    
+      if(yn_shift_no == 1){ 
           return "yes"; 
           break;
       }
-      if(mapped_val == 3){ 
+      if(yn_shift_no == 3){ 
           return "no";
           break;
       }
@@ -262,7 +252,13 @@ String YesOrNo_gearshifter(Adafruit_seesaw seesaw){
             break;
           } 
       }
-  }            
+    }
+    else if (millis() - start_time > timeout){
+            return "timeout";
+            delay(700);
+            break;
+     }         
+    }
 }
 
 

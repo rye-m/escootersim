@@ -12,10 +12,12 @@
 #include <spotify_foot_button.hpp>
 #include <nback_foot_button.hpp>
 #include <spotify_footpedal.hpp>
+#include <nback_footpedal.hpp>
 #include <spotify_gearshifter.hpp>
 #include <nback_gearshifter.hpp>
 #include <spotify_throttle.hpp>
 #include <nback_throttle.hpp>
+#include <nback_watch.hpp>
 #include <Arduino.h>
 
 
@@ -48,15 +50,15 @@ void setup(){
             nback_button_setup();
             break;
         case 206:
-            Serial.println("206");
-            // nback_footpedal_setup();
+            Serial.println("nback_footpedal_setup");
+            nback_footpedal_setup();
             break;
         case 207:
-            Serial.println("207");
+            Serial.println("nback_gearshifter_setup");
             nback_gearshifter_setup();
             break;
         case 208:
-            Serial.println("208");
+            Serial.println("nback_throttle_setup");
             nback_throttle_setup();
             break;
         case 209:
@@ -69,7 +71,7 @@ void setup(){
             break;
         case 211:
             Serial.println("nback_watch_setup");
-            nback_watch_setup();
+            // nback_watch_setup();
             break;
         default:
             Serial.println("default");
@@ -97,10 +99,9 @@ void loop() {
             break;
         case 206:
             Serial.println("206");
-            // nback_gearshifter_loop();
+            nback_gearshifter_loop();
             break;
         case 207:
-            Serial.println("207");
             nback_gearshifter_loop();
             break;
         case 208:
@@ -113,9 +114,10 @@ void loop() {
             nback_foot_button_loop();
             break;
         case 211:
-            nback_watch_loop();
+            // nback_watch_loop();
             break;
         default:
+            Serial.print("default: ");
             Serial.println(res_code);
             break;
         }
