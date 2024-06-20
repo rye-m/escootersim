@@ -1,30 +1,38 @@
 var express = require('express');
 var app = express();
-var expressWs = require('express-ws')(app);
+var ws = require('ws')
+var tinyws= require('tinyws').tinyws
+// import {tinyws} from tinyws;
 
-app.use(function (req, res, next) {
-  console.log('middleware');
-  req.testing = 'testing';
-  return next();
-});
+// var expressWs = require('express-ws')(app);
 
-app.get('/', function(req, res, next){
-  console.log('get route', req.testing);
-  res.end();
-});
+app.use('/hmr', tinyws(), async (req, res) => {
+  if (req.ws) {
+    const ws = await req.ws()
 
-app.ws('/', function(ws, req) {
-  ws.on('message', function(msg) {
-    console.log(msg);
-  });
-  console.log('socket', req.testing);
-});
+    return ws.send('hello from express@4')
+  } else {
+    res.send('Hello from HTTP!')
+  }
+})
 
-app.ws('/echo', function(ws, req) {
-    ws.on('message', function(msg) {
-      ws.send(msg);
-    });
-  });
+// app.get('/', function(req, res, next){
+//   console.log('get route', req.testing);
+//   res.end();
+// });
+
+// app.ws('/', function(ws, req) {
+//   ws.on('message', function(msg) {
+//     console.log(msg);
+//   });
+//   console.log('socket', req.testing);
+// });
+
+// app.ws('/echo', function(ws, req) {
+//     ws.on('message', function(msg) {
+//       ws.send(msg);
+//     });
+//   });
 
 // Start the server
 const port = 3000;

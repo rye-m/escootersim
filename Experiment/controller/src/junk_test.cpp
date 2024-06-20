@@ -94,7 +94,7 @@ void setup() {
         delay(1000);
     }
 
-    WiFiMulti.addAP("WhiteSky-PublicWiFi", "");
+    WiFiMulti.addAP("deviceFarm", "device@theFarm");
 
     while(WiFiMulti.run() != WL_CONNECTED) {
         delay(100);

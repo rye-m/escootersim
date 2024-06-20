@@ -19,34 +19,26 @@ var client_id = '978e25ba8b0442adaeca418801d80593'; // your clientId
 var client_secret = 'f9d9bc4ddd8640a5bf3cd8bed05a9db7'; // Your secret
 var redirect_uri = 'http://localhost:8888/callback'; // Your redirect uri
 
-var mode = 'none'; // init app mode
+var mode = 'None! Please select a mode to play!'; // init app mode
 
 global.ACCESS_TOKEN = ''
 
-var expressWs = require('express-ws')(app);
+// var expressWs = require('express-ws')(app);
 
-app.ws('/echo', function(ws, req) {
-  ws.on('message', function(msg) {
-    ws.send(msg);
-  });
-});
-
-
+// app.ws('/echo', function(ws, req) {
+//   ws.on('message', function(msg) {
+//     ws.send(msg);
+//   });
+// });
 
 
 
-
-
-
-
-
-
-const generateRandomString = (length) => {
-  return crypto
-  .randomBytes(60)
-  .toString('hex')
-  .slice(0, length);
-}
+// const generateRandomString = (length) => {
+//   return crypto
+//   .randomBytes(60)
+//   .toString('hex')
+//   .slice(0, length);
+// }
 
 var stateKey = 'spotify_auth_state';
 
@@ -190,9 +182,9 @@ app.get('/api/:command', jsonParser, function(req, res){
   }
 )
 
-app.post('/nback', jsonParser, function(req, res){
+app.get('/nback/:command', jsonParser, function(req, res){
 
-  command = req.body.command
+  command = req.params['command']
   console.log("command: " + command);
 
 var player = require('play-sound')();

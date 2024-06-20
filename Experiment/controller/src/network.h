@@ -4,7 +4,7 @@
 
 const char *ssid = "deviceFarm";
 const char *password = "device@theFarm";
-const String ipaddress = "192.168.1.103";
+const String ipaddress = "192.168.1.103"; // Type "ipconfig getifaddr en0" in Terminal 
 
 int sendRequest(String path) {
   // Conect to the WiFi
