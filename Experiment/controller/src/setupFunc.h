@@ -8,7 +8,7 @@ delay(1000);
 
 WiFi.mode(WIFI_STA); //Optional
 WiFi.begin(ssid, password);
-Serial.println("\nConnecting");
+Serial.println("\nConnecting to Wi-Fi");
 
 while(WiFi.status() != WL_CONNECTED){
     Serial.print(".");

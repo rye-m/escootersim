@@ -71,8 +71,6 @@ void ButtonState_button(){
 
 void spotify_button_setup(){
   
-  // Wire1.setPins(SDA1, SCL1);
-
   // I2C_setup_for_PyQT() 
   Wire1.begin(); // TinyPico only
   //check if button will acknowledge over I2C
