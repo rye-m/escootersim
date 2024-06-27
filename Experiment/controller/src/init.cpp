@@ -1,12 +1,18 @@
 #include <network.h>
 #include <utils.h>
 #include <setupFunc.h>
+
 #include <WiFi.h>
 #include <HTTPClient.h>
 #include <Wire.h>
+#include <WebSocketsClient.h>
+#include <WiFiMulti.h>
+#include <WiFiClientSecure.h>
+
 #include "Adafruit_MPR121.h"
 #include <SparkFun_Qwiic_Button.h>
 #include <seesaw_neopixel.h>
+
 #include <spotify_button.hpp>
 #include <nback_button.hpp>
 #include <spotify_foot_button.hpp>
@@ -71,7 +77,7 @@ void setup(){
             break;
         case 211:
             Serial.println("nback_watch_setup");
-            // nback_watch_setup();
+            nback_watch_setup();
             break;
         default:
             Serial.println("default");
@@ -98,7 +104,6 @@ void loop() {
             nback_button_loop();
             break;
         case 206:
-            Serial.println("206");
             nback_gearshifter_loop();
             break;
         case 207:
@@ -114,11 +119,12 @@ void loop() {
             nback_foot_button_loop();
             break;
         case 211:
-            // nback_watch_loop();
+            nback_watch_loop();
             break;
         default:
             Serial.print("default: ");
             Serial.println(res_code);
+            delay(5000);
             break;
         }
     }

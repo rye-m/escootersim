@@ -1,9 +1,18 @@
 #include "Adafruit_MPR121.h"
 #include <SparkFun_Qwiic_Button.h>
 #include <seesaw_neopixel.h>
+#include <WiFiClientSecure.h>
+#include <WebSocketsClient.h>
 
 #define SECONDARY_I2C_PORT &Wire1
+#define  DEFAULT_I2C_ADDR 0x30
+#define  ANALOGIN   18
+#define  NEOPIXELOUT 14
 
+QwiicButton button;
+Adafruit_seesaw seesaw(&Wire1);
+seesaw_NeoPixel pixels = seesaw_NeoPixel(4, NEOPIXELOUT, NEO_GRB + NEO_KHZ800);
+WebSocketsClient webSocket;
 
 const int sequenceLength = 10;
 const int n = 1;
@@ -12,10 +21,12 @@ const int foot_button_pin = A1; // analog pin connected to X output
 const int throttle_pin = A2; // analog pin connected to X output
 const int throttle_th = 2900; // thrashhold for the potentiometer of the throttle
 
-#define  DEFAULT_I2C_ADDR 0x30
-#define  ANALOGIN   18
-#define  NEOPIXELOUT 14
 uint8_t brightness = 100;   //The brightness to set the LED to when the button is pushed
+WStype_t global_type;
+// uint8_t global_payload = 0;
+uint8_t yes[3] = {0x59, 0x65, 0x73};
+uint8_t no[2] = {0x4e, 0x65};
+String global_payload = "";
 
 
 String flg;
@@ -26,7 +37,7 @@ int previous_shift_no = 99;
 
 int one_up_bgn = 910;
 int one_up_end = 926;
-int two_up_bgn = 815;
+int two_up_bgn = 812;
 int two_up_end = 860;
 int three_up_bgn = 763;
 int three_up_end = 820;
@@ -38,7 +49,7 @@ int six_up_bgn = 598;
 int six_up_end = 612;
 int one_down_bgn = 924;
 int one_down_end = 995;
-int two_down_bgn = 840;
+int two_down_bgn = 850;
 int two_down_end = 871;
 int three_down_bgn = 782;
 int three_down_end = 812;
@@ -49,24 +60,20 @@ int five_down_end = 704;
 int six_down_bgn = 601;
 int six_down_end = 612;
 
-QwiicButton button;
-Adafruit_seesaw seesaw(&Wire1);
-seesaw_NeoPixel pixels = seesaw_NeoPixel(4, NEOPIXELOUT, NEO_GRB + NEO_KHZ800);
-
 
 void gearshifter_setup() {
   Wire1.begin();
-  if (!seesaw.begin(DEFAULT_I2C_ADDR)) {
+  while (!seesaw.begin(DEFAULT_I2C_ADDR)) {
     Serial.println(F("seesaw not found!"));
-    while(1) delay(10);
+    delay(1000);
   }
-  delay(500);
   Serial.println(F("seesaw found!"));
 }
 
+
 int read_gearshifter() {
   int raw_val = seesaw.analogRead(ANALOGIN);
-  Serial.print(raw_val);
+  // Serial.println(raw_val);
 
   if (data[0] > raw_val){
     if (one_up_bgn < raw_val and raw_val < one_up_end){ shifter_no = 1; flg = "up";}
@@ -88,12 +95,12 @@ int read_gearshifter() {
   }
   else {flg = "stay";}
 
-  Serial.print(",\t");
-  Serial.print(data[0]);
-  Serial.print(",\t");
-  Serial.print(shifter_no);
-  Serial.print(",\t");
-  Serial.println(flg);
+  // Serial.print(",\t");
+  // Serial.print(data[0]);
+  // Serial.print(",\t");
+  // Serial.print(shifter_no);
+  // Serial.print(",\t");
+  // Serial.println(flg);
 
   for (int i = 0; i < 9; i++) {
     new_data[i] = data[i+1];
@@ -104,7 +111,6 @@ int read_gearshifter() {
   }
   return shifter_no;
 }
-
 
 
 bool isPressed(int pin, int thr){
@@ -229,33 +235,34 @@ String YesOrNo_foot_button(int foot_button_pin){
 String YesOrNo_gearshifter(Adafruit_seesaw seesaw){
   uint32_t  start_time = millis();
   int yn_previous_shift_no = 2;
+  int yes_shift_no = 1;
+  int no_shift_no = 3;
 
   while (true) {
     int yn_shift_no = read_gearshifter();
+    Serial.print("yn_shift_no: ");
+    Serial.println(yn_shift_no);
 
-    if(yn_shift_no == yn_previous_shift_no){
-      yn_previous_shift_no = yn_shift_no;
-    }
-    else if(yn_shift_no != yn_previous_shift_no){    
-      if(yn_shift_no == 1){ 
+    if(yn_shift_no != yn_previous_shift_no){    
+      if(yn_shift_no == yes_shift_no){ 
           return "yes"; 
           break;
       }
-      if(yn_shift_no == 3){ 
+      if(yn_shift_no == no_shift_no){ 
           return "no";
           break;
       }
       else{
           if(millis() - start_time > timeout){
             return "timeout";
-            delay(700);
+            // delay(700);
             break;
           } 
       }
     }
     else if (millis() - start_time > timeout){
             return "timeout";
-            delay(700);
+            // delay(700);
             break;
      }         
     }
@@ -295,11 +302,10 @@ String YesOrNo_throttle(int throttle_pin){
 }
 
 
-
 void react(String answer){
     sendRequest("nback", answer);
     Serial.println(answer);
-    delay(300);
+    delay(400);
 }
 
 bool assert_result(int i, std::vector<int> sequence, String userInput){
@@ -348,6 +354,110 @@ bool assert_result(int i, std::vector<int> sequence, String userInput){
     return false;
 }
 
+
+void hexdump(const void *mem, uint32_t len, uint8_t cols = 16) {
+	const uint8_t* src = (const uint8_t*) mem;
+	Serial.printf("\n[HEXDUMP] Address: 0x%08X len: 0x%X (%d)", (ptrdiff_t)src, len, len);
+	for(uint32_t i = 0; i < len; i++) {
+		if(i % cols == 0) {
+			Serial.printf("\n[0x%08X] 0x%08X: ", (ptrdiff_t)src, i);
+		}
+		Serial.printf("%02X ", *src);
+		src++;
+	}
+	Serial.printf("\n");
+}
+
+
+void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
+  global_type = type;
+	
+  switch(type) {
+		case WStype_DISCONNECTED:
+			Serial.printf("[WSc] Disconnected!\n");
+			break;
+		case WStype_CONNECTED:
+			Serial.printf("[WSc] Connected to url: %s\n", payload);
+
+			// send message to server when Connected
+			// webSocket.sendTXT("Connected");
+			break;
+		case WStype_TEXT:
+			Serial.printf("[WSc] get text: %s\n", payload);
+      global_payload = (char *)payload;
+
+			// Serial.print("global_payload: ");
+			// Serial.println(global_payload);
+			// send message to server
+			// webSocket.sendTXT("message here");
+			break;
+		case WStype_BIN:
+			Serial.printf("[WSc] get binary length: %u\n", length);
+			hexdump(payload, length);
+			// send data to server
+			// webSocket.sendBIN(payload, length);
+			break;
+		case WStype_ERROR:			
+		case WStype_FRAGMENT_TEXT_START:
+		case WStype_FRAGMENT_BIN_START:
+		case WStype_FRAGMENT:
+		case WStype_FRAGMENT_FIN:
+      global_payload = "";
+			break;
+	}
+}
+
+
+String YesOrNo_watch() {
+	uint32_t  start_time;
+  uint32_t  diff;
+
+	webSocket.begin(ipaddress, 3000, "/mode_server/Nback_watch");
+	webSocket.onEvent(webSocketEvent);
+	// webSocket.setReconnectInterval(5000);
+
+
+  start_time = millis();
+  
+  while(true){
+    webSocket.loop();
+    if(global_type == WStype_TEXT){
+      if(global_payload == "yes"){
+        Serial.println("yes");
+        global_payload = "";
+        webSocket.disconnect();
+        return "yes"; //Buffer 59 65 73
+        break;
+      }
+      else if(global_payload == "no"){ 
+        Serial.println("no");
+        global_payload = "";
+        webSocket.disconnect();
+        return "no"; //Buffer 4e 6f
+        break;
+      }
+      else if(millis() - start_time > timeout){
+        Serial.print("global_payload: ");
+        Serial.println(global_payload);
+        webSocket.disconnect();
+        global_payload = "";
+        return "timeout";
+        break;
+      } 
+    }
+    else{
+      if(millis() - start_time > timeout){
+        webSocket.disconnect();
+        global_payload = "";
+        return "timeout";
+        break;
+      } 
+        // Serial.println(global_payload);
+    }
+  }
+}
+
+
 // Input a value 0 to 255 to get a color value.
 // The colours are a transition r - g - b - back to r.
 void changeColor(int status, seesaw_NeoPixel pixels) {
@@ -393,7 +503,7 @@ void nBackTask(const std::vector<int>& sequence, int n, int input_type) {
     for (int i = 0; i < sequence.size(); ++i) {
         sendRequest("nback", String(std::to_string(sequence[i]).c_str()));
         Serial.println("\n\"" + String(std::to_string(sequence[i]).c_str()) + "\"");
-        delay(200);
+        delay(300);
         Serial.print("Match? -> ");
         switch (input_type)
         {
@@ -409,6 +519,9 @@ void nBackTask(const std::vector<int>& sequence, int n, int input_type) {
         case 4:
           userInput = YesOrNo_throttle(throttle_pin);
           break;
+        case 5:
+          userInput = YesOrNo_watch();
+          break;
         
         default:
           break;
@@ -417,6 +530,7 @@ void nBackTask(const std::vector<int>& sequence, int n, int input_type) {
         if (assert_result(i, sequence, userInput)) {
             correctCount++;
         }
+        Serial.println(userInput);
         delay(1000);
     }
 
