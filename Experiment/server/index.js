@@ -49,6 +49,8 @@ app.use(express.static(__dirname + '/public'))
 // create application/json parser
 var jsonParser = bodyParser.json()
 var path = require('path');
+
+
 // Broadcast function to send a message to all connected clients
 function broadcast(message) {
   clients.forEach(client => {
@@ -57,6 +59,14 @@ function broadcast(message) {
     }
   });
 }
+
+
+function logger(log_message){
+  time_stamp = Math.floor(+new Date() / 1000)
+  // broadcast(`${time_stamp}: ${log_message}`);
+  broadcast(`${log_message}`);
+}
+
 
 // WebSocket connection handler
 wss.on('connection', (ws) => {
@@ -103,11 +113,11 @@ app.get('/mode_tinypico', jsonParser, function(req, res){
       console.log('Spotify_button');
       statuscode = 201;
       break;
-      case 'Spotify_foot_button':
-        console.log('Spotify_foot_button');
-        statuscode = 209;
-        break;
-      case 'Spotify_footpedal':
+    case 'Spotify_foot_button':
+      console.log('Spotify_foot_button');
+      statuscode = 209;
+      break;
+    case 'Spotify_footpedal':
       console.log('Spotify_footpedal');
       statuscode = 202;
       break;
@@ -123,11 +133,11 @@ app.get('/mode_tinypico', jsonParser, function(req, res){
       console.log('Nback_button');
       statuscode = 205;
       break;
-      case 'Nback_foot_button':
-        console.log('Nback_foot_button');
-        statuscode = 210;
-        break;
-      case 'Nback_footpedal':
+    case 'Nback_foot_button':
+      console.log('Nback_foot_button');
+      statuscode = 210;
+      break;
+    case 'Nback_footpedal':
       console.log('Nback_footpedal');
       statuscode = 206;
       break;
@@ -143,11 +153,31 @@ app.get('/mode_tinypico', jsonParser, function(req, res){
       console.log('Nback_watch');
       statuscode = 211;
       break;
-    default:
+      case 'Navi_button':
+        console.log('Navi_button');
+        statuscode = 212;
+      break;
+      case 'Navi_foot_button':
+        console.log('Navi_foot_button');
+        statuscode = 213;
+        break;
+      case 'Navi_gearshifter':
+        console.log('Navi_gearshifter');
+        statuscode = 214;
+        break;
+      case 'Navi_throttle':
+        console.log('Navi_throttle');
+        statuscode = 215;
+        break;
+      case 'Navi_watch':
+        console.log('Navi_watch');
+        statuscode = 216;
+        break;
+      default:
     console.log(`Sorry, there is no ${mode}.`);
       break;
   }
-  
+  logger(`mode: ${mode}`);
   res.sendStatus(statuscode);        
 
 })
@@ -188,6 +218,8 @@ app.get('/api/:command', jsonParser, function(req, res){
   console.log("authOptions.url: " + authOptions.url);
 
   if (command == 'next' || command == 'previous'){
+    logger(`Spotify_command: ${command}`);
+
     request.post(authOptions, function(error, response, body) {
       res.json(response.statusCode);
       // res.status(response.statusCode).sendFile('button.html', {root: path.join(__dirname, 'public')});
@@ -195,6 +227,8 @@ app.get('/api/:command', jsonParser, function(req, res){
     })
   }
   else if (command == 'play' || command == 'pause'){
+    logger(`Spotify_command: ${command}`);
+
     request.put(authOptions, function(error, response, body) {
       res.json(response.statusCode);
       // res.status(response.statusCode).sendFile('button.html', {root: path.join(__dirname, 'public')});
@@ -226,23 +260,38 @@ app.get('/nback_watch_http/:answer', jsonParser, function(req, res){
 
   answer = req.params['answer']
   console.log("answer: " + answer);
+  // logger(`N-back_command: ${answer}`);
 
   broadcast(answer);
   res.sendFile('nback_watch.html', {root: path.join(__dirname, 'public')});
 
 })
 
+
 app.get('/nback/:command', jsonParser, function(req, res){
 
   command = req.params['command']
   console.log("command: " + command);
 
-var player = require('play-sound')();
-player.play('./audio/' + command + '.mp3', (err) => {
-    if (err) console.log(`Could not play sound: ${err}`);
-});
+  var player = require('play-sound')();
+  player.play('./audio/' + command + '.mp3', (err) => {
+      if (err) console.log(`Could not play sound: ${err}`);
+  });
+  logger(`N-back: ${command}`);
+
   res.sendStatus(200);        
 
+})
+
+
+app.get('/navi/:command', jsonParser, function(req, res){
+
+  command = req.params['command']
+  console.log("command: " + command);
+  broadcast(command);
+  logger(`Navi_command: ${command}`);
+
+  res.sendStatus(200);        
 })
 
 

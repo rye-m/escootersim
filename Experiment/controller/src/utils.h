@@ -17,8 +17,8 @@ WebSocketsClient webSocket;
 const int sequenceLength = 10;
 const int n = 1;
 const int timeout = 3000;
-const int foot_button_pin = A1; // analog pin connected to X output
-const int throttle_pin = A2; // analog pin connected to X output
+const int foot_button_pin = A2; // analog pin connected to X output
+const int throttle_pin = A1; // analog pin connected to X output
 const int throttle_th = 2900; // thrashhold for the potentiometer of the throttle
 
 uint8_t brightness = 100;   //The brightness to set the LED to when the button is pushed
@@ -35,30 +35,30 @@ int data[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 int new_data[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 int previous_shift_no = 99;
 
-int one_up_bgn = 910;
-int one_up_end = 926;
-int two_up_bgn = 812;
-int two_up_end = 860;
-int three_up_bgn = 763;
-int three_up_end = 820;
-int four_up_bgn = 713;
-int four_up_end = 756;
-int five_up_bgn = 658;
-int five_up_end = 711;
-int six_up_bgn = 598;
-int six_up_end = 612;
-int one_down_bgn = 924;
-int one_down_end = 995;
-int two_down_bgn = 850;
-int two_down_end = 871;
-int three_down_bgn = 782;
-int three_down_end = 812;
-int four_down_bgn = 730;
-int four_down_end = 764;
-int five_down_bgn = 676;
-int five_down_end = 704;
-int six_down_bgn = 601;
-int six_down_end = 612;
+int one_up_bgn = 24;
+int one_up_end =33;
+int two_up_bgn = 120;
+int two_up_end = 130;
+int three_up_bgn = 178;
+int three_up_end = 185;
+int four_up_bgn = 232;
+int four_up_end = 282;
+int five_up_bgn = 290;
+int five_up_end = 296;
+int six_up_bgn = 374;
+int six_up_end = 380;
+int one_down_bgn = 0;
+int one_down_end = 3;
+int two_down_bgn = 4;
+int two_down_end = 101;
+int three_down_bgn = 105;
+int three_down_end = 153;
+int four_down_bgn = 160;
+int four_down_end = 208;
+int five_down_bgn = 212;
+int five_down_end = 268;
+int six_down_bgn = 272;
+int six_down_end = 375;
 
 
 void gearshifter_setup() {
@@ -73,24 +73,24 @@ void gearshifter_setup() {
 
 int read_gearshifter() {
   int raw_val = seesaw.analogRead(ANALOGIN);
-  // Serial.println(raw_val);
+  // Serial.print(raw_val);
 
-  if (data[0] > raw_val){
-    if (one_up_bgn < raw_val and raw_val < one_up_end){ shifter_no = 1; flg = "up";}
+  if (data[0] < raw_val){
+    if (raw_val < one_up_end){ shifter_no = 1; flg = "up";}
     else if (two_up_bgn < raw_val and raw_val < two_up_end){ shifter_no = 2; flg = "up";}
     else if (three_up_bgn < raw_val and raw_val < three_up_end){ shifter_no = 3; flg = "up";}
     else if (four_up_bgn < raw_val and raw_val < four_up_end){ shifter_no = 4; flg = "up";}
     else if (five_up_bgn < raw_val and raw_val < five_up_end){ shifter_no = 5; flg = "up";}
-    else if (six_up_bgn < raw_val and raw_val < six_up_end){ shifter_no = 6; flg = "up";}
+    else if (six_up_bgn < raw_val){ shifter_no = 6; flg = "up";}
     else {flg = "up";}
   } 
-  else if (data[0] < raw_val){
-    if (one_down_bgn < raw_val and raw_val < one_down_end){ shifter_no = 1; flg = "down";}
+  else if (data[0] > raw_val){
+    if (raw_val < one_down_end){ shifter_no = 1; flg = "down";}
     else if (two_down_bgn < raw_val and raw_val < two_down_end){ shifter_no = 2; flg = "down";}
     else if (three_down_bgn < raw_val and raw_val < three_down_end){ shifter_no = 3; flg = "down";}
     else if (four_down_bgn < raw_val and raw_val < four_down_end){ shifter_no = 4; flg = "down";}
     else if (five_down_bgn < raw_val and raw_val < five_down_end){ shifter_no = 5; flg = "down";}
-    else if (six_down_bgn < raw_val and raw_val < six_down_end){ shifter_no = 6; flg = "down";}
+    else if (six_down_bgn < raw_val){ shifter_no = 6; flg = "down";}
     else {flg = "down";}
   }
   else {flg = "stay";}
@@ -181,12 +181,12 @@ String YesOrNo_button(QwiicButton button){
           button.LEDoff();
           diff = millis() - start_time_pressed;
           if(diff <= 500){
-              Serial.println("yes");
-              return "yes";
-          }
-          else{
               Serial.println("no");
               return "no";
+          }
+          else{
+              Serial.println("yes");
+              return "yes";
           }
           break;
       }
@@ -235,8 +235,8 @@ String YesOrNo_foot_button(int foot_button_pin){
 String YesOrNo_gearshifter(Adafruit_seesaw seesaw){
   uint32_t  start_time = millis();
   int yn_previous_shift_no = 2;
-  int yes_shift_no = 1;
-  int no_shift_no = 3;
+  int yes_shift_no = 2;
+  int no_shift_no = 4;
 
   while (true) {
     int yn_shift_no = read_gearshifter();
@@ -411,8 +411,9 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
 String YesOrNo_watch() {
 	uint32_t  start_time;
   uint32_t  diff;
+  String url = "/mode_server/Nback_watch";
 
-	webSocket.begin(ipaddress, port, "/mode_server/Nback_watch");
+	webSocket.begin(ipaddress, port, url);
 	webSocket.onEvent(webSocketEvent);
 	// webSocket.setReconnectInterval(5000);
 

@@ -15,11 +15,18 @@ void setup() {
 }
 
 void loop() {
-  Serial.print(map(analogRead(A_pin), 260, 820, 0, 100)/100.00);
+  // debug
+  // Serial.print(analogRead(A_pin));
+  // Serial.print(",");
+  // Serial.print(analogRead(B_pin));
+  // Serial.print(",");
+  // Serial.println(analogRead(S_pin));
+
+  Serial.print(map(analogRead(A_pin), 270, 800, 0, 100)/100.00);
   Serial.print(",");
-  Serial.print(map(analogRead(B_pin), 290, 690, 0, 100)/100.00);
+  Serial.print(map(analogRead(B_pin), 295, 700, 0, 100)/100.00);
   Serial.print(",");
-  Serial.println(map(analogRead(S_pin), 260, 670, 50, -45)/100.00);
+  Serial.println(map(analogRead(S_pin), 410, 813, 50, -45)/100.00); // C: 622
   delay(9);
 }
 

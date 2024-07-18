@@ -15,8 +15,10 @@
 
 #include <spotify_button.hpp>
 #include <nback_button.hpp>
+#include <navi_button.hpp>
 #include <spotify_foot_button.hpp>
 #include <nback_foot_button.hpp>
+#include <navi_foot_button.hpp>
 #include <spotify_footpedal.hpp>
 #include <nback_footpedal.hpp>
 #include <spotify_gearshifter.hpp>
@@ -79,6 +81,26 @@ void setup(){
             Serial.println("nback_watch_setup");
             nback_watch_setup();
             break;
+        case 212:
+            Serial.println("navi_button_setup");
+            navi_button_setup();
+            break;
+        // case 213:
+        //     Serial.println("navi_foot_button_setup");
+        //     navi_foot_button_setup();
+        //     break;
+        // case 214:
+        //     Serial.println("navi_gearshifter_setup");
+        //     navi_gearshifter_setup();
+        //     break;
+        // case 215:
+        //     Serial.println("navi_throttle_setup");
+        //     navi_throttle_setup();
+        //     break;
+        // case 216:
+        //     Serial.println("navi_watch_setup");
+        //     navi_watch_setup();
+        //     break;
         default:
             Serial.println("default");
             break;
@@ -121,6 +143,21 @@ void loop() {
         case 211:
             nback_watch_loop();
             break;
+        case 212:
+            navi_button_loop();
+            break;
+        // case 213:
+        //     navi_foot_button_loop();
+        //     break;
+        // case 214:
+        //     navi_gearshifter_loop();
+        //     break;
+        // case 215:
+        //     navi_throttle_loop();
+        //     break;
+        // case 216:
+        //     navi_watch_loop();
+        //     break;        
         default:
             Serial.print("default: ");
             Serial.println(res_code);
