@@ -30,37 +30,87 @@ int data[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 int new_data[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 int previous_shift_no = 99;
 
-int one_up_bgn = 910;
-int one_up_end = 926;
-int two_up_bgn = 812;
-int two_up_end = 860;
-int three_up_bgn = 763;
-int three_up_end = 820;
-int four_up_bgn = 713;
-int four_up_end = 756;
-int five_up_bgn = 658;
-int five_up_end = 711;
-int six_up_bgn = 598;
-int six_up_end = 612;
-int one_down_bgn = 924;
-int one_down_end = 995;
-int two_down_bgn = 850;
-int two_down_end = 871;
-int three_down_bgn = 782;
-int three_down_end = 812;
-int four_down_bgn = 730;
-int four_down_end = 764;
-int five_down_bgn = 676;
-int five_down_end = 704;
-int six_down_bgn = 601;
-int six_down_end = 612;
+int one_up_bgn = 24;
+int one_up_end =33;
+int two_up_bgn = 120;
+int two_up_end = 130;
+int three_up_bgn = 178;
+int three_up_end = 185;
+int four_up_bgn = 232;
+int four_up_end = 282;
+int five_up_bgn = 290;
+int five_up_end = 296;
+int six_up_bgn = 374;
+int six_up_end = 380;
+int one_down_bgn = 0;
+int one_down_end = 3;
+int two_down_bgn = 4;
+int two_down_end = 101;
+int three_down_bgn = 105;
+int three_down_end = 153;
+int four_down_bgn = 160;
+int four_down_end = 208;
+int five_down_bgn = 212;
+int five_down_end = 268;
+int six_down_bgn = 272;
+int six_down_end = 375;
 
+
+// int one_up_bgn = 0;
+// int one_up_end = 0;
+// int two_up_bgn = 1;
+// int two_up_end = 95;
+// int three_up_bgn = 102;
+// int three_up_end = 152;
+// int four_up_bgn = 156;
+// int four_up_end = 204;
+// int five_up_bgn = 214;
+// int five_up_end = 265;
+// int six_up_bgn = 274;
+// int six_up_end = 371;
+// int one_down_bgn = 16;
+// int one_down_end = 32;
+// int two_down_bgn = 112;
+// int two_down_end = 125;
+// int three_down_bgn = 170;
+// int three_down_end = 184;
+// int four_down_bgn = 228;
+// int four_down_end = 240;
+// int five_down_bgn = 284;
+// int five_down_end = 295;
+// int six_down_bgn = 348;
+// int six_down_end = 372;
+
+// int one_up_bgn = 16;
+// int one_up_end = 32;
+// int two_up_bgn = 112;
+// int two_up_end = 125;
+// int three_up_bgn = 170;
+// int three_up_end = 184;
+// int four_up_bgn = 228;
+// int four_up_end = 240;
+// int five_up_bgn = 284;
+// int five_up_end = 295;
+// int six_up_bgn = 348;
+// int six_up_end = 372;
+// int one_down_bgn = 0;
+// int one_down_end = 0;
+// int two_down_bgn = 1;
+// int two_down_end = 95;
+// int three_down_bgn = 102;
+// int three_down_end = 152;
+// int four_down_bgn = 156;
+// int four_down_end = 204;
+// int five_down_bgn = 214;
+// int five_down_end = 265;
+// int six_down_bgn = 274;
+// int six_down_end = 371;
 
 void setup() {
 
   Serial.begin(115200);
   while (!Serial) delay(10);   // wait until serial port is opened
-  delay(3000);
+  delay(1000);
 
   Serial.println(F("Adafruit PID 5295 I2C QT Slide Potentiometer test!"));
   delay(1000);
@@ -77,24 +127,24 @@ void setup() {
 
 void loop() {
   int raw_val = seesaw.analogRead(ANALOGIN);
-//   Serial.println(raw_val);
+  Serial.print(raw_val);
 
-  if (data[0] > raw_val){
-    if (one_up_bgn < raw_val and raw_val < one_up_end){ shifter_no = 1; flg = "up";}
+  if (data[0] < raw_val){
+    if (raw_val < one_up_end){ shifter_no = 1; flg = "up";}
     else if (two_up_bgn < raw_val and raw_val < two_up_end){ shifter_no = 2; flg = "up";}
     else if (three_up_bgn < raw_val and raw_val < three_up_end){ shifter_no = 3; flg = "up";}
     else if (four_up_bgn < raw_val and raw_val < four_up_end){ shifter_no = 4; flg = "up";}
     else if (five_up_bgn < raw_val and raw_val < five_up_end){ shifter_no = 5; flg = "up";}
-    else if (six_up_bgn < raw_val and raw_val < six_up_end){ shifter_no = 6; flg = "up";}
+    else if (six_up_bgn < raw_val){ shifter_no = 6; flg = "up";}
     else {flg = "up";}
   } 
-  else if (data[0] < raw_val){
-    if (one_down_bgn < raw_val and raw_val < one_down_end){ shifter_no = 1; flg = "down";}
+  else if (data[0] > raw_val){
+    if (raw_val < one_down_end){ shifter_no = 1; flg = "down";}
     else if (two_down_bgn < raw_val and raw_val < two_down_end){ shifter_no = 2; flg = "down";}
     else if (three_down_bgn < raw_val and raw_val < three_down_end){ shifter_no = 3; flg = "down";}
     else if (four_down_bgn < raw_val and raw_val < four_down_end){ shifter_no = 4; flg = "down";}
     else if (five_down_bgn < raw_val and raw_val < five_down_end){ shifter_no = 5; flg = "down";}
-    else if (six_down_bgn < raw_val and raw_val < six_down_end){ shifter_no = 6; flg = "down";}
+    else if (six_down_bgn < raw_val){ shifter_no = 6; flg = "down";}
     else {flg = "down";}
   }
   else {flg = "stay";}
@@ -114,3 +164,31 @@ void loop() {
       data[i] = new_data[i];
   }
 }
+
+
+// void setup() {
+//   Serial.begin(115200);
+
+//   while (!Serial) delay(10);   // wait until serial port is opened
+//   delay(3000);
+
+//   Serial.println(F("Adafruit PID 5295 I2C QT Slide Potentiometer test!"));
+
+//   Wire1.begin();
+//   if (!seesaw.begin(DEFAULT_I2C_ADDR)) {
+//     Serial.println(F("seesaw not found!"));
+//     while(1) delay(10);
+//   }
+
+//   Serial.println(F("seesaw started OK!"));
+// }
+
+
+
+// void loop() {
+//   // read the potentiometer
+//   uint16_t slide_val = seesaw.analogRead(ANALOGIN);
+//   Serial.println(slide_val);
+
+//   delay(50);
+// }

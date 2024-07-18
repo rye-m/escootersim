@@ -5,11 +5,20 @@
 // const char *ssid = "deviceFarm";
 // const char *password = "device@theFarm";
 // const String ipaddress = "192.168.1.103"; // Type "ipconfig getifaddr en0" in Terminal 
-const String port = "8888"; // Default port
+const uint16_t port = 8888; // Default port
 
 const char *ssid = "Enoki";
 const char *password = "W0nton$oup";
-const String ipaddress = "192.168.1.10"; // Type "ipconfig getifaddr en0" in Terminal 
+const String ipaddress = "192.168.1.2"; // Type "ipconfig getifaddr en0" in Terminal 
+
+// const char *ssid = "AIRLab";
+// const char *password = "AIRLab2023";
+// const String ipaddress = "192.168.0.103";
+
+// const char *ssid = "TP-Link_D18C";
+// const char *password = "51283841";
+// const String ipaddress = "192.168.0.109";
+
 
 int sendRequest(String path) {
   // Conect to the WiFi

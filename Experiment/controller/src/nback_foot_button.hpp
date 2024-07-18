@@ -9,7 +9,7 @@ void nback_foot_button_setup(){
   if (digitalRead(foot_button_pin)) {
     Serial.println("Device did not acknowledge! Freezing.");
   }
-  Serial.println("Button acknowledged.");
+  Serial.println("Foot button acknowledged.");
 
   sendRequest("nback",  "connected");
 }
