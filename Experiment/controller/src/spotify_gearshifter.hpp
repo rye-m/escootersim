@@ -23,20 +23,20 @@ void spotify_gearshifter_loop() {
         switch (shift_no)
           {
           case 1: // gearshifter
-              Serial.println("next");
-              sendRequest("api",  "next");
+              Serial.println("play 1st song");
+              sendRequest("gearshifter",  "0");
             break;
           case 2:
-              sendRequest("api",  "play");
-              Serial.println("play");
+              Serial.println("play 2nd song");
+              sendRequest("gearshifter",  "1");
             break;
           case 3:
-              Serial.println("pause");
-              sendRequest("api",  "pause");
+              Serial.println("play 3rd song");
+              sendRequest("gearshifter",  "2");
             break;
           case 4:
-              Serial.println("previous");
-              sendRequest("api",  "previous");
+              Serial.println("play 4th song");
+              sendRequest("gearshifter",  "3");
             break;
           case 5:
               Serial.println("Gear: 5 doesn't do anything");
