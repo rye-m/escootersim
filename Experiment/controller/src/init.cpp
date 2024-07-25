@@ -15,14 +15,8 @@
 
 #include <spotify_button.hpp>
 #include <nback_button.hpp>
-#include <navi_button.hpp>
 #include <spotify_foot_button.hpp>
 #include <nback_foot_button.hpp>
-#include <navi_foot_button.hpp>
-#include <spotify_footpedal.hpp>
-#include <nback_footpedal.hpp>
-#include <spotify_gearshifter.hpp>
-#include <nback_gearshifter.hpp>
 #include <spotify_throttle.hpp>
 #include <nback_throttle.hpp>
 #include <nback_watch.hpp>
