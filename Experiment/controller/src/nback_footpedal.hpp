@@ -56,14 +56,12 @@ void nback_footpedal_setup(){
 
 
 void nback_footpedal_loop() {
+	delay(10000);
 
-    if(button.isPressed() == true){
-      sendRequest("nback",  "begin");
-      delay(2000);
-      std::vector<int> sequence = generateRandomSequence(sequenceLength);
-      nBackTask(sequence, n, 3);
-      delay(60000);
-    }
-
+  sendRequest("nback",  "begin");
+  delay(2000);
+  std::vector<long> sequence = generateRandomSequence(sequenceLength);
+  nBackTask(sequence, n, 3);
+  delay(300000);
 
 }

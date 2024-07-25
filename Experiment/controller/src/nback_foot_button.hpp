@@ -17,13 +17,12 @@ void nback_foot_button_setup(){
 
 void nback_foot_button_loop() {
 
-    if(! digitalRead(foot_button_pin)){
-      sendRequest("nback",  "begin");
-      delay(2000);
-      std::vector<int> sequence = generateRandomSequence(sequenceLength);
-      nBackTask(sequence, n, 3);
-      delay(60000);
-    }
+	delay(10000);
 
+  sendRequest("nback",  "begin");
+  delay(2000);
+  std::vector<long> sequence = generateRandomSequence(sequenceLength);
+  nBackTask(sequence, n, 3);
+  delay(300000);
 
 }
