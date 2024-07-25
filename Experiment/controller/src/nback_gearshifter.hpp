@@ -14,9 +14,9 @@ void nback_gearshifter_loop() {
       if(shift_no == 3){
         sendRequest("nback",  "begin");
         delay(2000);
-        std::vector<int> sequence = generateRandomSequence(sequenceLength);
+        std::vector<long> sequence = generateRandomSequence(sequenceLength);
         nBackTask(sequence, n, 1);
-        delay(120000);
+        delay(300000);
       }
 
     }

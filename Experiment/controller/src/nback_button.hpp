@@ -19,13 +19,12 @@ void nback_button_setup(){
 
 void nback_button_loop() {
 
-    if(button.isPressed() == true){
-      sendRequest("nback",  "begin");
-      delay(2000);
-      std::vector<int> sequence = generateRandomSequence(sequenceLength);
-      nBackTask(sequence, n, 0);
-      delay(60000);
-    }
+	delay(10000);
 
+  sendRequest("nback",  "begin");
+  delay(2000);
+  std::vector<long> sequence = generateRandomSequence(sequenceLength);
+  nBackTask(sequence, n, 0);
+  delay(300000);
 
 }

@@ -23,12 +23,12 @@ void nback_watch_setup() {
 }
 
 void nback_watch_loop() {
-	delay(5000);
+	delay(10000);
 
 	sendRequest("nback",  "begin");
 	delay(2000);
-	std::vector<int> sequence = generateRandomSequence(sequenceLength);
+	std::vector<long> sequence = generateRandomSequence(sequenceLength);
 	nBackTask(sequence, n, 5);
-	delay(120000);
+	delay(300000);
 }
 

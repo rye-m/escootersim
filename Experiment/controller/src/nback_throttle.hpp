@@ -13,14 +13,13 @@ void nback_throttle_setup(){
 
 
 void nback_throttle_loop() {
+	delay(10000);
 
-    if(isPressed(throttle_pin, throttle_th)){
-      sendRequest("nback",  "begin");
-      delay(2000);
-      std::vector<int> sequence = generateRandomSequence(sequenceLength);
-      nBackTask(sequence, n, 4);
-      delay(60000);
-    }
+  sendRequest("nback",  "begin");
+  delay(2000);
+  std::vector<long> sequence = generateRandomSequence(sequenceLength);
+  nBackTask(sequence, n, 4);
+  delay(300000);
 
 
 }

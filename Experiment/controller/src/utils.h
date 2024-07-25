@@ -150,13 +150,14 @@ bool playOrPause() {
 }
 
 
-std::vector<int> generateRandomSequence(int length) {
-    std::vector<int> sequence;
+std::vector<long> generateRandomSequence(int length) {
+    std::vector<long> sequence;
     std::uniform_int_distribution<> dis(1, 9); // Generate integers between 1 and 9
-    
+    randomSeed(time(NULL));
+
     Serial.print("sequence: ");
     for (int i = 0; i < length; ++i) {
-        int temp = rand() % 10;
+        long temp = random(10);
         sequence.push_back(temp);
         Serial.print(temp);
     }
@@ -308,7 +309,7 @@ void react(String answer){
     delay(400);
 }
 
-bool assert_result(int i, std::vector<int> sequence, String userInput){
+bool assert_result(int i, std::vector<long> sequence, String userInput){
 
     if (i - n < 0){
         if (userInput == "yes"){
@@ -496,7 +497,7 @@ uint32_t Wheel(byte WheelPos) {
 
 
 // Function to run the N-back task
-void nBackTask(const std::vector<int>& sequence, int n, int input_type) {
+void nBackTask(const std::vector<long>& sequence, int n, int input_type) {
 
     int correctCount = 0;
     String userInput;

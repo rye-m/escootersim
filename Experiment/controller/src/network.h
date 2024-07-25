@@ -9,7 +9,7 @@ const uint16_t port = 8888; // Default port
 
 const char *ssid = "Enoki";
 const char *password = "W0nton$oup";
-const String ipaddress = "192.168.1.2"; // Type "ipconfig getifaddr en0" in Terminal 
+const String ipaddress = "192.168.1.6"; // Type "ipconfig getifaddr en0" in Terminal 
 
 // const char *ssid = "AIRLab";
 // const char *password = "AIRLab2023";
