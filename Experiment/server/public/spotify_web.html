@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html data-theme="light">
+
+<head>
+    <title>🛴NDRT_sim</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta charset="utf-8">
+    <!-- <link rel="stylesheet" type="text/css" href="http://192.168.1.103:3000/public/button.css" /> -->
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤖</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap" rel="stylesheet">
+    <!-- https://codepen.io/annarosca/pen/YzqLwOe, https://icon-sets.iconify.design/f7/ -->
+</head>
+
+<body>
+    <div class="container">
+        <ul class="top-btn" style="list-style: none; padding-left: 0;">
+            <li><a class="link-btn colorname1" onclick="location.href='/api/previous'"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxZW0iIGhlaWdodD0iMWVtIiB2aWV3Qm94PSIwIDAgNTYgNTYiPjxwYXRoIGZpbGw9IndoaXRlIiBkPSJNOS4yNSA0Ny4wOWg1LjMyYzIuMDYzIDAgMy4xMTctMS4wNzggMy4xMTctMy4xNFYyOC44NzhhMy43MSAzLjcxIDAgMCAxLS4xMTctLjg5YzAtLjMyOS4wNDctLjYzNC4xMTctLjkxNVYxMi4wMjdjMC0yLjEzMi0xLjA1NC0zLjExNy0zLjExNy0zLjExN0g5LjI1Yy0yLjA2MiAwLTMuMTQgMS4wNzgtMy4xNCAzLjExN1Y0My45NWMwIDIuMDYzIDEuMDc3IDMuMTQgMy4xNCAzLjE0bTM3LjI2Ni0uNzAzYzEuODUxIDAgMy4zNzUtMS4zODMgMy4zNzUtNC4wMDhWMTMuNTk4YzAtMi42MjUtMS41MjQtNC4wMzItMy4zNzUtNC4wMzJjLS45MzggMC0xLjczNS4zMDUtMi42OTYuODY4TDE5LjkzOCAyNC40OTZjLTEuMjY2Ljc1LTEuOTcgMS42MTctMi4yNSAyLjU3OHYxLjgwNWMuMjguOTg0Ljk4NCAxLjgyOCAyLjI1IDIuNjAxTDQzLjgyIDQ1LjUyYy45NjEuNTYyIDEuNzU4Ljg2NyAyLjY5Ni44NjciLz48L3N2Zz4=" class="icon"></a></li>
+            <li><a class="link-btn colorname2" onclick="location.href='/api/playpause'"><br><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxZW0iIGhlaWdodD0iMWVtIiB2aWV3Qm94PSIwIDAgNTYgNTYiPjxwYXRoIGZpbGw9IndoaXRlIiBkPSJNMzQuNTQzIDQ0LjczM2g0LjQ4MWMxLjczNyAwIDIuNjQ1LS45MDggMi42NDUtMi42NDVWMTUuMjAzYzAtMS43OTYtLjkwOC0yLjYyNS0yLjY0NS0yLjYyNWgtNC40OGMtMS43MzggMC0yLjYyNi45MDgtMi42MjYgMi42MjV2MjYuODg1YzAgMS43MzcuODg4IDIuNjQ1IDIuNjI1IDIuNjQ1bTE0LjM1IDBoNC40ODFjMS43MzcgMCAyLjYyNi0uOTA4IDIuNjI2LTIuNjQ1VjE1LjIwM2MwLTEuNzk2LS44ODktMi42MjUtMi42MjYtMi42MjVoLTQuNDhjLTEuNzM3IDAtMi42NDUuOTA4LTIuNjQ1IDIuNjI1djI2Ljg4NWMwIDEuNzM3LjkwOCAyLjY0NSAyLjY0NSAyLjY0NW0tNDYuMDUtLjU5MmMuODA5IDAgMS40OC0uMjU3IDIuMjctLjczbDIwLjExNC0xMS44MjRjMS40MDEtLjgzIDIuMDEzLTEuODE2IDIuMDEzLTIuOTQxYzAtMS4xNDUtLjYxMi0yLjExMi0yLjAxMy0yLjk0MUw1LjExMiAxMy44NmMtLjgwOS0uNDc0LTEuNDYtLjczLTIuMjctLjczQzEuMzAyIDEzLjEzIDAgMTQuMzE1IDAgMTYuNTI2djI0LjI0YzAgMi4yMSAxLjMwMyAzLjM3NSAyLjg0MiAzLjM3NSIvPjwvc3ZnPg==" class="icon"></a></li>
+            <li><a class="link-btn colorname3" onclick="location.href='/api/next'"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxZW0iIGhlaWdodD0iMWVtIiB2aWV3Qm94PSIwIDAgNTYgNTYiPjxwYXRoIGZpbGw9IndoaXRlIiBkPSJNOS40ODQgNDYuMzg3Yy45NjEgMCAxLjc1OC0uMzA1IDIuNjk2LS44NjdsMjMuODgzLTE0LjA0YzEuMjg5LS43NzMgMS45OTItMS42MTcgMi4yNS0yLjYwMXYxNS4wN2MwIDIuMDYzIDEuMDc4IDMuMTQgMy4xNCAzLjE0aDUuMzJjMi4wNjMgMCAzLjExOC0xLjA3NyAzLjExOC0zLjE0VjEyLjAyN2MwLTIuMTMyLTEuMDU1LTMuMTE3LTMuMTE3LTMuMTE3aC01LjMyYy0yLjA2MyAwLTMuMTQyIDEuMDc4LTMuMTQyIDMuMTE3djE1LjA0N2MtLjI1Ny0uOTYtLjk2LTEuODI4LTIuMjUtMi41NzhMMTIuMTggMTAuNDM0Yy0uOTYxLS41NjMtMS43MzUtLjg2OC0yLjY5Ni0uODY4Yy0xLjgyOCAwLTMuMzc1IDEuNDA3LTMuMzc1IDQuMDMydjI4Ljc4YzAgMi42MjYgMS41NDcgNC4wMDkgMy4zNzUgNC4wMDkiLz48L3N2Zz4="></a></li>
+        </ul>
+    </div>
+</div>
+
+<style>
+    .top-btn{
+        display: flex;
+        flex-wrap:wrap;
+    }
+    .top-btn li {
+        width: calc(100%/3);/*3つ並べる場合*/
+        padding:0 2px;/*左右に余白を入れる場合*/
+        box-sizing:border-box;
+    }
+    .top-btn li img {
+        max-width:100%; /*はみだしを防ぐ*/
+        height: 15em; /* keep aspect ratio */
+    }
+    /*Link button design setting*/
+    .link-btn {
+        text-decoration: none!important;
+        justify-content: center; /* center in width */
+        align-items: center;/* center in hight */
+        color: #fff!important;
+        display: flex!important;/* 画面に合わせてサイズが変わる */
+        flex-wrap:wrap!important;/* 要素の折り返し設定 */
+        font-weight: bold;
+        width: calc(100%/3);/*3つ並べる場合*/
+        padding: 40px 30px;
+        border-radius: 50px;
+        box-shadow: none;
+        transition: .2s;
+        font-size: 5px;
+        
+        
+    }
+    .link-btn:hover {
+        box-shadow: none;
+        transform: translateY(2px);
+        opacity: .8;
+    }
+    /*ボタン色設定*/
+    .colorname1 {
+        background: #01846a
+    }
+    .colorname2 {
+        background: #01846a;
+    }
+    .colorname3 {
+        background: #01846a;
+    }
+    
+    </style>
+    
+<!-- 
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="description" content="" />
+	<meta name="author" content="" />
+	<meta name="viewport" content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, width=device-width" />
+	<title></title>
+	<link href="css/styles.css" rel="stylesheet" />
+	<style>
+		.icon{
+			position: relative;
+			height: 0.8em;
+			margin-right:10px;
+			top: 0px;
+		}
+		
+		button {
+			color: white;
+			font-weight: bold;
+			background-color: red;
+			padding:5px 10px;
+			border-radius: 20px;
+			border: none;
+			height: 32px;
+
+		}
+	</style>
+</head>
+<body>
+	<button><img src="img/Framework7 PlayPause.svg" class="icon">Test</button>
+
+	<script type="text/javascript" src="scripts.js"></script>
+</body>
+</html> -->
