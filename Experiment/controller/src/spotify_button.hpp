@@ -52,7 +52,7 @@ void ButtonState_button(){
                 Ti = millis()-DoubleClickTick;
 //              Serial.println(Ti,DEC);
                 if( Ti <= 500){                         // シングルクリックから500ms以内だったら、ダブルクリック確定
-                  Serial.println("Doble click: next");
+                  Serial.println("Double click: next");
                   sendRequest("api",  "next");
                   state = 0;
                 } else {
@@ -89,4 +89,4 @@ void spotify_button_setup(){
 
 void spotify_button_loop() {
   ButtonState_button();
-  }
+}

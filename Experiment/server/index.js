@@ -65,6 +65,7 @@ function broadcast(message) {
 function logger(log_message){
   // time_stamp = Math.floor(+new Date() / 1000)
   // broadcast(`${time_stamp}: ${log_message}`);
+  console.log(`${log_message}`)
   broadcast(`${log_message}`);
 }
 
@@ -200,7 +201,7 @@ app.get('/mode_server/:mode', jsonParser, function(req, res){
   if (req.params['mode'] != 'mode'){
     mode = req.params['mode']
   }
-  console.log('mode: ' + mode);
+  logger(`mode: ${mode}`);
 
   if (mode == "Authentication"){
     res.sendFile('spotify.html', {root: path.join(__dirname, 'public')});
@@ -210,6 +211,9 @@ app.get('/mode_server/:mode', jsonParser, function(req, res){
   }
   else if (mode == "web"){
     res.sendFile('spotify_web.html', {root: path.join(__dirname, 'public')});
+  }
+  else if (RegExp("^Nback").test(mode)){
+    res.sendFile('nback.html', {root: path.join(__dirname, 'public')});
   }
   else{
     res.set('Content-Type', 'text/html');
@@ -363,38 +367,13 @@ app.get('/nback_watch_http/:answer', jsonParser, function(req, res){
 
 })
 
-app.get('/nback_generator/:command', jsonParser, function(req, res){
-  let generating = false;
-  let intervalId;
-  var previous_number = 99;
-  var latest_number = 99
+app.get('/nback_controller/:command', jsonParser, function(req, res){
 
-  const numCount = 10; // Number of random numbers to generate
-  const min = 1;       // Minimum value in the range
-  const max = 10;     // Maximum value in the range
-  
   command = req.params['command']
-  if(command == "START"){
-    if (!generating) {
-      generating = true;
-      intervalId = setInterval(() => {
-          let randomNum= Math.floor(Math.random() * (max - min + 1) + min);
-
-          var player = require('play-sound')();
-          player.play('./audio/' + randomNum + '.mp3', (err) => {
-              if (err) console.log(`Could not play sound: ${err}`);
-          });
-          logger(`N-back: ${randomNum}`);
-        
-        
-      }, 1000); // Send a random number every second
+  broadcast(command);
+  res.sendFile('nback.html', {root: path.join(__dirname, 'public')});
   }
-
-  }
-  broadcast(answer);
-  res.sendFile('nback_watch.html', {root: path.join(__dirname, 'public')});
-
-})
+)
 
 
 app.get('/nback/:command', jsonParser, function(req, res){
