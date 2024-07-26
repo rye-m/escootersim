@@ -22,6 +22,7 @@ var client_secret = 'f9d9bc4ddd8640a5bf3cd8bed05a9db7'; // Your secret
 var redirect_uri = 'http://localhost:8888/callback'; // Your redirect uri
 
 var mode = 'None! Please select a mode to play!'; // init app mode
+var spotify_count; // counter for Spotify
 
 global.ACCESS_TOKEN = ''
 
@@ -82,6 +83,16 @@ wss.on('connection', (ws) => {
     // Broadcast the message to all clients
     broadcast(`Client said: ${message}`);
   });
+
+  ws.on('generate_number', (message) => {
+    console.log('Received:', message);
+
+    // Broadcast the message to all clients
+    broadcast(`Client said: ${message}`);
+  });
+
+
+
 
   // Handle disconnection
   ws.on('close', () => {
@@ -183,6 +194,8 @@ app.get('/mode_tinypico', jsonParser, function(req, res){
 
 
 app.get('/mode_server/:mode', jsonParser, function(req, res){
+  spotify_count = 1; // init counter for Spotify
+  console.log("spotify_count: " + spotify_count)
 
   if (req.params['mode'] != 'mode'){
     mode = req.params['mode']
@@ -220,15 +233,36 @@ app.get('/api/:command', jsonParser, function(req, res){
   };
   console.log("authOptions.url: " + authOptions.url);
 
-    if (command == 'next' || command == 'previous'){
-      logger(`Spotify: ${command}`);
+    if (command == 'next' || command == 'previous'){      
+      if ((command == 'next' && spotify_count == 4) || (command == 'previous' && spotify_count == 1)){
+        logger(`Spotify: ${command}_failed`);
+        
+        var player = require('play-sound')();
+        player.play('./audio/Buzz.wav', (err) => {
+        if (err) console.log(`Could not play sound: ${err}`);
+        });
+        res.sendStatus(204)
+        return; // Exit the function if there's an error
+      }
 
       request.post(authOptions, function(error, response, body) {
-        if (mode = 'web'){ res.sendFile('spotify_web.html', {root: path.join(__dirname, 'public')})}
-        else {res.sendStatus(204)}    
-        console.log("response: " + response.statusCode);
+        logger(`Spotify: ${command}`);
+
+        if (response.statusCode >= 200 && response.statusCode < 300){
+          if (command == 'next'){spotify_count++;}
+          if (command == 'previous'){spotify_count--;}
+          console.log("spotify_count(changed): " + spotify_count)
+
+          if (mode = 'web'){ res.sendFile('spotify_web.html', {root: path.join(__dirname, 'public')})}
+          else {res.sendStatus(204)}    
+          console.log("response???: " + response.statusCode);
+        }
+        else{
+          res.sendStatus(response.statusCode)
+        }
       })
     }
+
     else if (command == 'play' || command == 'pause'){
       logger(`Spotify: ${command}`);
 
@@ -284,9 +318,8 @@ app.get('/api/:command', jsonParser, function(req, res){
           console.log(e);
           console.log("Error: " + e);
       }
-      })}
-    // }
-}  
+    })}
+  }  
 )
 
 
@@ -319,13 +352,45 @@ app.get('/gearshifter/:track_no', jsonParser, function(req, res){
 )
 
 
-
 app.get('/nback_watch_http/:answer', jsonParser, function(req, res){
 
   answer = req.params['answer']
   console.log("answer: " + answer);
   // logger(`N-back: ${answer}`);
 
+  broadcast(answer);
+  res.sendFile('nback_watch.html', {root: path.join(__dirname, 'public')});
+
+})
+
+app.get('/nback_generator/:command', jsonParser, function(req, res){
+  let generating = false;
+  let intervalId;
+  var previous_number = 99;
+  var latest_number = 99
+
+  const numCount = 10; // Number of random numbers to generate
+  const min = 1;       // Minimum value in the range
+  const max = 10;     // Maximum value in the range
+  
+  command = req.params['command']
+  if(command == "START"){
+    if (!generating) {
+      generating = true;
+      intervalId = setInterval(() => {
+          let randomNum= Math.floor(Math.random() * (max - min + 1) + min);
+
+          var player = require('play-sound')();
+          player.play('./audio/' + randomNum + '.mp3', (err) => {
+              if (err) console.log(`Could not play sound: ${err}`);
+          });
+          logger(`N-back: ${randomNum}`);
+        
+        
+      }, 1000); // Send a random number every second
+  }
+
+  }
   broadcast(answer);
   res.sendFile('nback_watch.html', {root: path.join(__dirname, 'public')});
 
