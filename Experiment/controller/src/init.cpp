@@ -23,139 +23,73 @@
 #include <Arduino.h>
 
 
-int res_code = 0;
+bool log_valid(String text){
+    if (text == "mode: Spotify_button"
+     ||  text == "mode: Spotify_foot_button"
+     ||  text == "mode: Spotify_throttle"
+     ||  text == "mode: Nback_button"
+     ||  text == "mode: Nback_foot_button"
+     ||  text == "mode: Nback_throttle"
+     ||  text == "mode: Nback_watch"
+     ||  text == "mode: web"
+    ){return false;}
+    else {return true;}    
+}
+
+
+
+bool loop_loop(void (*function)()) {
+        global_payload = "";
+        while(log_valid(global_payload)){
+            webSocket.loop();
+            (*function)();
+        }
+        return true;
+
+}
+
 
 void setup(){
     init_wifi();
-
-    res_code = sendRequest("mode_tinypico");
-    Serial.println(res_code);
-    switch(res_code) {
-        case 201:
-            Serial.println("spotify_button_setup");
-            spotify_button_setup();
-            break;
-        case 202:
-            Serial.println("spotify_footpedal_setup");
-            spotify_footpedal_setup();
-            break;
-        case 203:
-            Serial.println("spotify_gearshifter_setup");
-            spotify_gearshifter_setup();
-            break;
-        case 204:
-            Serial.println("spotify_throttle_setup");
-            spotify_throttle_setup();
-            break;
-        case 205:
-            Serial.println("nback_button_setup");
-            nback_button_setup();
-            break;
-        case 206:
-            Serial.println("nback_footpedal_setup");
-            nback_footpedal_setup();
-            break;
-        case 207:
-            Serial.println("nback_gearshifter_setup");
-            nback_gearshifter_setup();
-            break;
-        case 208:
-            Serial.println("nback_throttle_setup");
-            nback_throttle_setup();
-            break;
-        case 209:
-            Serial.println("spotify_foot_button_setup");
-            spotify_foot_button_setup();
-            break;
-        case 210:
-            Serial.println("nback_foot_button_setup");
-            nback_foot_button_setup();
-            break;
-        case 211:
-            Serial.println("nback_watch_setup");
-            nback_watch_setup();
-            break;
-        case 212:
-            Serial.println("navi_button_setup");
-            navi_button_setup();
-            break;
-        // case 213:
-        //     Serial.println("navi_foot_button_setup");
-        //     navi_foot_button_setup();
-        //     break;
-        // case 214:
-        //     Serial.println("navi_gearshifter_setup");
-        //     navi_gearshifter_setup();
-        //     break;
-        // case 215:
-        //     Serial.println("navi_throttle_setup");
-        //     navi_throttle_setup();
-        //     break;
-        // case 216:
-        //     Serial.println("navi_watch_setup");
-        //     navi_watch_setup();
-        //     break;
-        default:
-            Serial.println("default");
-            break;
-        }
+	webSocket.begin(ipaddress, port);
+	webSocket.onEvent(webSocketEvent);
 }
 
 
 void loop() {
-    switch(res_code) {
-        case 201:
-            spotify_button_loop();
-            break;
-        case 202:
-            spotify_footpedal_loop();
-            break;
-        case 203:
-            spotify_gearshifter_loop();
-            break;
-        case 204:
-            spotify_throttle_loop();
-            break;
-        case 205:
-            nback_button_loop();
-            break;
-        case 206:
-            nback_gearshifter_loop();
-            break;
-        case 207:
-            nback_gearshifter_loop();
-            break;
-        case 208:
-            nback_throttle_loop();
-            break;
-        case 209:
-            spotify_foot_button_loop();
-            break;
-        case 210:
-            nback_foot_button_loop();
-            break;
-        case 211:
-            nback_watch_loop();
-            break;
-        case 212:
-            navi_button_loop();
-            break;
-        // case 213:
-        //     navi_foot_button_loop();
-        //     break;
-        // case 214:
-        //     navi_gearshifter_loop();
-        //     break;
-        // case 215:
-        //     navi_throttle_loop();
-        //     break;
-        // case 216:
-        //     navi_watch_loop();
-        //     break;        
-        default:
-            Serial.print("default: ");
-            Serial.println(res_code);
-            delay(5000);
-            break;
-        }
+
+    webSocket.loop();
+    // Serial.print("-");
+    if(global_type == WStype_TEXT){
+
+      if(global_payload == "mode: Spotify_button"){
+        spotify_button_setup();
+        loop_loop(spotify_button_loop);
+      }
+      else if(global_payload == "mode: Spotify_foot_button"){
+        spotify_foot_button_setup();
+        loop_loop(spotify_foot_button_loop);
+      }
+      else if(global_payload == "mode: Spotify_throttle"){
+        spotify_throttle_setup();
+        loop_loop(spotify_throttle_loop);
+      }
+      else if(global_payload == "mode: Nback_button"){
+        nback_button_setup();
+        loop_loop(nback_button_loop);
+      }
+      else if(global_payload == "mode: Nback_foot_button"){
+        nback_foot_button_setup();
+        loop_loop(nback_foot_button_loop);
+      }
+      else if(global_payload == "mode: Nback_throttle"){
+        nback_throttle_setup();
+        loop_loop(nback_throttle_loop);
+      }
+      else if(global_payload == "mode: Nback_watch"){ 
+        nback_throttle_setup();
+        loop_loop(nback_watch_loop);
+      }
     }
+    // Serial.println("global_payload: " + global_payload);
+}

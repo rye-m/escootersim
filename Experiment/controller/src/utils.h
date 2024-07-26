@@ -433,7 +433,6 @@ String YesOrNo_watch() {
       }
       else if(global_payload == "no"){ 
         Serial.println("no");
-        global_payload = "";
         webSocket.disconnect();
         return "no"; //Buffer 4e 6f
         break;
