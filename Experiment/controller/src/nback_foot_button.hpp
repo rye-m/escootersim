@@ -16,13 +16,8 @@ void nback_foot_button_setup(){
 
 
 void nback_foot_button_loop() {
+	sendRequest("nback",  "begin");
+	delay(2000);
 
-	delay(10000);
-
-  sendRequest("nback",  "begin");
-  delay(2000);
-  std::vector<long> sequence = generateRandomSequence(sequenceLength);
-  nBackTask(sequence, n, 3);
-  delay(300000);
-
+	nBackTask(3);
 }

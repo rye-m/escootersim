@@ -150,19 +150,22 @@ bool playOrPause() {
 }
 
 
-std::vector<long> generateRandomSequence(int length) {
+long generateRandomSequence(int length) {
     std::vector<long> sequence;
     std::uniform_int_distribution<> dis(1, 9); // Generate integers between 1 and 9
-    randomSeed(time(NULL));
+    long current_time = time(NULL);
+    randomSeed(current_time);
+    Serial.println("current_time: " + current_time);
+    long temp = random(10);
 
-    Serial.print("sequence: ");
-    for (int i = 0; i < length; ++i) {
-        long temp = random(10);
-        sequence.push_back(temp);
-        Serial.print(temp);
-    }
+    // Serial.print("sequence: ");
+    // for (int i = 0; i < length; ++i) {
+    //     long temp = random(10);
+    //     sequence.push_back(temp);
+    //     Serial.print(temp);
+    // }
       Serial.println("");
-    return sequence;
+    return temp;
 }
 
 
@@ -309,9 +312,9 @@ void react(String answer){
     delay(400);
 }
 
-bool assert_result(int i, std::vector<long> sequence, String userInput){
+bool assert_result(int i, int prev_num, int crnt_num, String userInput){
 
-    if (i - n < 0){
+    if (i = 1){
         if (userInput == "yes"){
             react("incorrect");
         }
@@ -328,7 +331,7 @@ bool assert_result(int i, std::vector<long> sequence, String userInput){
     }
     else{
         if (userInput == "yes") {
-            if (sequence[i] == sequence[i - n]) {
+            if (crnt_num == prev_num) {
                 react("correct");
                 return true;
             }
@@ -337,7 +340,7 @@ bool assert_result(int i, std::vector<long> sequence, String userInput){
             }
         }
         else if (userInput == "no") {
-            if (sequence[i] != sequence[i - n]) {
+            if (crnt_num != prev_num) {
                 react("correct");
                 return true;
             }
@@ -496,46 +499,55 @@ uint32_t Wheel(byte WheelPos) {
 
 
 // Function to run the N-back task
-void nBackTask(const std::vector<long>& sequence, int n, int input_type) {
+void nBackTask(int input_type) {
 
-    int correctCount = 0;
-    String userInput;
+  int wholeCount = 0;
+  int correctCount = 0;
+  int current_num = 99;
+  int previous_num = 99;
+  String userInput;
 
-    for (int i = 0; i < sequence.size(); ++i) {
-        sendRequest("nback", String(std::to_string(sequence[i]).c_str()));
-        Serial.println("\n\"" + String(std::to_string(sequence[i]).c_str()) + "\"");
-        delay(300);
-        Serial.print("Match? -> ");
-        switch (input_type)
-        {
-        case 0: // button
-          userInput = YesOrNo_button(button);
-          break;
-        case 1: // gearshifter
-          userInput = YesOrNo_gearshifter(seesaw);
-          break;
-        case 3:
-          userInput = YesOrNo_foot_button(foot_button_pin);
-          break;
-        case 4:
-          userInput = YesOrNo_throttle(throttle_pin);
-          break;
-        case 5:
-          userInput = YesOrNo_watch();
-          break;
-        
-        default:
-          break;
-        }
+  while (global_payload != "finish_nback"){
+    webSocket.loop();
+    wholeCount ++;
 
-        if (assert_result(i, sequence, userInput)) {
-            correctCount++;
-        }
-        Serial.println(userInput);
-        delay(1000);
+    previous_num = current_num;
+    current_num = generateRandomSequence(1);
+
+    sendRequest("nback", String(std::to_string(current_num).c_str()));
+    Serial.println("\n\"" + String(std::to_string(current_num).c_str()) + "\"");
+    delay(300);
+    Serial.print("Match? -> ");
+    switch (input_type)
+    {
+    case 0: // button
+      userInput = YesOrNo_button(button);
+      break;
+    case 1: // gearshifter
+      userInput = YesOrNo_gearshifter(seesaw);
+      break;
+    case 3:
+      userInput = YesOrNo_foot_button(foot_button_pin);
+      break;
+    case 4:
+      userInput = YesOrNo_throttle(throttle_pin);
+      break;
+    case 5:
+      userInput = YesOrNo_watch();
+      break;
+    
+    default:
+      break;
     }
 
-    double accuracy = static_cast<double>(correctCount) / sequenceLength * 100;
+    if (assert_result(wholeCount, previous_num, current_num, userInput)) {
+        correctCount++;
+    }
+    Serial.println(userInput);
+    delay(1000);
+  }
+  
+    double accuracy = static_cast<double>(correctCount) / wholeCount * 100;
     Serial.print("Accuracy: ");
     Serial.print(accuracy);
     sendRequest("nback", String(accuracy, DEC));
