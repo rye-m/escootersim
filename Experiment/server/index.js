@@ -250,14 +250,27 @@ app.get('/api/:command', jsonParser, function(req, res){
       }
       else if (command == 'next' && spotify_count == 1){
 
+        var tmp_url = ""
         authOptions.url = player_url + 'currently-playing';
         request.get(authOptions, function(error, response, body) {
           try {
-            if (response.body.is_playing == true) {
+            if (response.body.is_playing) {
+              spotify_count++;
               authOptions.url = player_url + 'next';
+              request.post(authOptions, function(error, response, body) {
+                console.log("response-: " + response.statusCode);
+                res.sendStatus(response.statusCode);
+                return; // Exit the function 
+                })  
             }
-            else {res.sendStatus(500); }
-            authOptions.url = player_url + 'play';        
+            else {
+              authOptions.url = player_url + 'play';
+              request.put(authOptions, function(error, response, body) {
+                console.log("response--: " + response.statusCode);
+                res.sendStatus(response.statusCode);
+                return; // Exit the function 
+                })  
+            }
           }
           catch(e) {
             console.log(e);
@@ -265,24 +278,26 @@ app.get('/api/:command', jsonParser, function(req, res){
           }
         })
       }
+      else{
+        request.post(authOptions, function(error, response, body) {
+          logger(`Spotify: ${command}`);
 
-      request.post(authOptions, function(error, response, body) {
-        logger(`Spotify: ${command}`);
+          if (response.statusCode >= 200 && response.statusCode < 300){
+            if (command == 'next'){spotify_count++;}
+            if (command == 'previous'){spotify_count--;}
+            console.log("spotify_count(changed): " + spotify_count)
 
-        if (response.statusCode >= 200 && response.statusCode < 300){
-          if (command == 'next'){spotify_count++;}
-          if (command == 'previous'){spotify_count--;}
-          console.log("spotify_count(changed): " + spotify_count)
-
-          if (mode = 'web'){ res.sendFile('spotify_web.html', {root: path.join(__dirname, 'public')})}
-          else {res.sendStatus(204)}    
-          console.log("response???: " + response.statusCode);
-        }
-        else{
-          res.sendStatus(response.statusCode)
-        }
-      })
+            if (mode = 'web'){ res.sendFile('spotify_web.html', {root: path.join(__dirname, 'public')})}
+            else {res.sendStatus(response.statusCode)}    
+            console.log("response???: " + response.statusCode);
+          }
+          else{
+            res.sendStatus(response.statusCode)
+          }
+        })
     }
+  }
+
 
     else if (command == 'play' || command == 'pause'){
       logger(`Spotify: ${command}`);

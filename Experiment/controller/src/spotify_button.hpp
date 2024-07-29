@@ -37,7 +37,6 @@ void ButtonState_button(){
             if( millis()-DoubleClickTick >= 500){       // シングルクリック確定
                 Serial.println("single click: next");
                 sendRequest("api",  "next");
-                playOrPause();
                 state = 0;
             }
             break;
@@ -75,9 +74,9 @@ void spotify_button_setup(){
   // I2C_setup_for_PyQT() 
   Wire1.begin(); // TinyPico only
   //check if button will acknowledge over I2C
-  if (button.begin(0x6F, Wire1) == false) {
+  while (!button.begin(0x6F, Wire1)) {
     Serial.println("Device did not acknowledge! Freezing.");
-    while (1);
+    delay(1000);
   }
   Serial.println("Button acknowledged.");
 
