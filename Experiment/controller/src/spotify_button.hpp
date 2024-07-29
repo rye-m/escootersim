@@ -35,7 +35,8 @@ void ButtonState_button(){
               button.LEDon(100);
             }
             if( millis()-DoubleClickTick >= 500){       // シングルクリック確定
-                Serial.println("click: play/puase");
+                Serial.println("single click: next");
+                sendRequest("api",  "next");
                 playOrPause();
                 state = 0;
             }
@@ -52,12 +53,12 @@ void ButtonState_button(){
                 Ti = millis()-DoubleClickTick;
 //              Serial.println(Ti,DEC);
                 if( Ti <= 500){                         // シングルクリックから500ms以内だったら、ダブルクリック確定
-                  Serial.println("Double click: next");
-                  sendRequest("api",  "next");
+                  // Serial.println("Double click: next");
+                  // sendRequest("api",  "next");
                   state = 0;
                 } else {
-                  Serial.println("click: play/puase");           // 
-                  playOrPause();
+                  // Serial.println("click: play/puase");           // 
+                  // playOrPause();
                   state = 0;                  
               }
             }

@@ -32,8 +32,8 @@ void ButtonState_throttle(){
               state = 3;
             }
             if( millis()-DoubleClickTick >= 500){       // シングルクリック確定
-                Serial.println("click: play/puase1");
-                playOrPause();
+                Serial.println("Doble click: next");
+                sendRequest("api",  "next");
                 state = 0;
             }
             break;
@@ -48,12 +48,12 @@ void ButtonState_throttle(){
                 Ti = millis()-DoubleClickTick;
 //              Serial.println(Ti,DEC);
                 if( Ti <= 700 and Ti > 300){                         // シングルクリックから500ms以内だったら、ダブルクリック確定
-                  Serial.println("Doble click: next");
-                  sendRequest("api",  "next");
+                  // Serial.println("Doble click: next");
+                  // sendRequest("api",  "next");
                   state = 0;
                 } else {
-                  Serial.println("click: play/puase2");           // 
-                  playOrPause();
+                  Serial.println("Doble click: next");
+                  sendRequest("api",  "next");
                   state = 0;                  
               }
             }
