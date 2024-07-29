@@ -248,6 +248,23 @@ app.get('/api/:command', jsonParser, function(req, res){
         res.sendStatus(204)
         return; // Exit the function if there's an error
       }
+      else if (command == 'next' && spotify_count == 1){
+
+        authOptions.url = player_url + 'currently-playing';
+        request.get(authOptions, function(error, response, body) {
+          try {
+            if (response.body.is_playing == true) {
+              authOptions.url = player_url + 'next';
+            }
+            else {res.sendStatus(500); }
+            authOptions.url = player_url + 'play';        
+          }
+          catch(e) {
+            console.log(e);
+            console.log("Error: " + e);
+          }
+        })
+      }
 
       request.post(authOptions, function(error, response, body) {
         logger(`Spotify: ${command}`);
