@@ -206,14 +206,14 @@ app.get('/mode_server/:mode', jsonParser, function(req, res){
   if (mode == "Authentication"){
     res.sendFile('spotify.html', {root: path.join(__dirname, 'public')});
   }
-  else if (mode == "Nback_watch") {
-    res.sendFile('nback_watch.html', {root: path.join(__dirname, 'public')});
+  else if (mode == "n_web") {
+    res.sendFile('nback_participant.html', {root: path.join(__dirname, 'public')});
   }
   else if (mode == "web"){
     res.sendFile('spotify_web.html', {root: path.join(__dirname, 'public')});
   }
   else if (RegExp("^Nback").test(mode)){
-    res.sendFile('nback.html', {root: path.join(__dirname, 'public')});
+    res.sendFile('nback_index.html', {root: path.join(__dirname, 'public')});
   }
   else{
     res.set('Content-Type', 'text/html');
@@ -363,7 +363,7 @@ app.get('/nback_watch_http/:answer', jsonParser, function(req, res){
   // logger(`N-back: ${answer}`);
 
   broadcast(answer);
-  res.sendFile('nback_watch.html', {root: path.join(__dirname, 'public')});
+  res.sendFile('nback_participant.html', {root: path.join(__dirname, 'public')});
 
 })
 
@@ -371,7 +371,15 @@ app.get('/nback_controller/:command', jsonParser, function(req, res){
 
   command = req.params['command']
   broadcast(command);
-  res.sendFile('nback.html', {root: path.join(__dirname, 'public')});
+  res.sendFile('nback_researcher.html', {root: path.join(__dirname, 'public')});
+  }
+)
+
+
+app.get('/nback_index/:type', jsonParser, function(req, res){
+
+  type = req.params['type']
+  res.sendFile(`nback_${type}.html`, {root: path.join(__dirname, 'public')});
   }
 )
 

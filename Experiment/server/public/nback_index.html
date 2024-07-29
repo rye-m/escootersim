@@ -11,33 +11,14 @@
 </head>
 
 <body>
-    <h1>Random Number Generator</h1>
+    <h1>N-back task: </h1>
     <main class="container">
         <ul class="top-btn" style="list-style: none; padding-left: 0;">
-            <li><a class="link-btn colorname1" href="/nback_watch_http/yes">START</a></li>
-            <li><a class="link-btn colorname2" href="/nback_watch_http/no">FINISH</a></li>
+            <li><a class="link-btn colorname1" href="/nback_index/participant">Participant</a></li>
+            <li><a class="link-btn colorname2" href="/nback_index/researcher">Researcher</a></li>
         </ul>
-        <button onclick="generateRandomNumbers()">Generate Numbers</button>
-        <div id="numbers"></div>
     
 </div>
-<script>
-    function generateRandomNumbers() {
-        const numCount = 10; // Number of random numbers to generate
-        const min = 1;       // Minimum value in the range
-        const max = 10;     // Maximum value in the range
-        
-        let numbers = [];
-        for (let i = 0; i < numCount; i++) {
-            // Generate a random number between min and max (inclusive)
-            let randomNum = Math.floor(Math.random() * (max - min + 1)) + min;
-            numbers.push(randomNum);
-        }
-
-        // Display the numbers
-        document.getElementById('numbers').innerText = 'Generated Numbers: ' + numbers.join(', ');
-    }
-</script>
 
 <style>
 .top-btn{
@@ -77,10 +58,10 @@
 }
 /*ボタン色設定*/
 .colorname1 {
-    background: #e54141
+    background: #41cae5
 }
 .colorname2 {
-    background: #9382f0;
+    background: #b9f082;
 }
 
 </style>

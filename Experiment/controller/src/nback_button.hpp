@@ -19,12 +19,15 @@ void nback_button_setup(){
 
 void nback_button_loop() {
 
-	delay(10000);
 
-  sendRequest("nback",  "begin");
-  delay(2000);
-  std::vector<long> sequence = generateRandomSequence(sequenceLength);
-  nBackTask(sequence, n, 0);
-  delay(300000);
-
+  while (true){
+    webSocket.loop();
+    if (global_payload == "start_nback"){
+      sendRequest("nback",  "begin");
+      delay(2000);
+      nBackTask(0);
+      break;
+    }
+  
+  }
 }

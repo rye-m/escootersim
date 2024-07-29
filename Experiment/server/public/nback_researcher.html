@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html data-theme="light">
+
+<head>
+    <title>🛴NDRT_sim</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta charset="utf-8">
+    <!-- <link rel="stylesheet" type="text/css" href="http://192.168.1.103:3000/public/button.css" /> -->
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤖</text></svg>">
+</head>
+
+<body>
+    <h1>Random Number Generator</h1>
+    <main class="container">
+        <ul class="top-btn" style="list-style: none; padding-left: 0;">
+            <li><a class="link-btn colorname1" href="/nback_controller/start_nback">START</a></li>
+            <li><a class="link-btn colorname2" href="/nback_controller/finish_nback">FINISH</a></li>
+        </ul>
+        <button onclick="generateRandomNumbers()">Generate Numbers</button>
+        <div id="numbers"></div>
+    
+</div>
+<script>
+    function generateRandomNumbers() {
+        const numCount = 10; // Number of random numbers to generate
+        const min = 1;       // Minimum value in the range
+        const max = 10;     // Maximum value in the range
+        
+        let numbers = [];
+        for (let i = 0; i < numCount; i++) {
+            // Generate a random number between min and max (inclusive)
+            let randomNum = Math.floor(Math.random() * (max - min + 1)) + min;
+            numbers.push(randomNum);
+        }
+
+        // Display the numbers
+        document.getElementById('numbers').innerText = 'Generated Numbers: ' + numbers.join(', ');
+    }
+</script>
+
+<style>
+.top-btn{
+	display: flex;
+	flex-wrap:wrap;
+}
+.top-btn li {
+	width: calc(100%/2);
+	padding:0 2px;
+	box-sizing:border-box;
+}
+.top-btn li img {
+	max-width:100%; /*はみだしを防ぐ*/
+	height: auto; /* keep aspect ratio */
+}
+/*Link button design setting*/
+.link-btn {
+    text-decoration: none!important;
+    justify-content: center; /* center in width */
+    align-items: center;/* center in hight */
+    color: #fff!important;
+    display: flex!important;/* 画面に合わせてサイズが変わる */
+    flex-wrap:wrap!important;/* 要素の折り返し設定 */
+    font-weight: bold;
+    padding: 50px 75px;
+    border-radius: 50px;
+    box-shadow: none;
+    transition: .2s;
+    font-size: 70px;
+    
+    
+}
+.link-btn:hover {
+    box-shadow: none;
+    transform: translateY(2px);
+    opacity: .8;
+}
+/*ボタン色設定*/
+.colorname1 {
+    background: #e54141
+}
+.colorname2 {
+    background: #9382f0;
+}
+
+</style>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        padding: 20px;
+    }
+    #numbers {
+        font-size: 1.2em;
+        margin-top: 20px;
+    }
+</style>
