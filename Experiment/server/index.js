@@ -50,6 +50,7 @@ app.use(express.static(__dirname + '/public'))
 // create application/json parser
 var jsonParser = bodyParser.json()
 var path = require('path');
+var client_number = 0;
 
 
 // Broadcast function to send a message to all connected clients
@@ -65,7 +66,7 @@ function broadcast(message) {
 function logger(log_message){
   // time_stamp = Math.floor(+new Date() / 1000)
   // broadcast(`${time_stamp}: ${log_message}`);
-  console.log(`${log_message}`)
+  console.log("broadcast: " + log_message);
   broadcast(`${log_message}`);
 }
 
@@ -73,6 +74,8 @@ function logger(log_message){
 // WebSocket connection handler
 wss.on('connection', (ws) => {
   console.log('New WebSocket connection');
+  client_number ++;
+  console.log("client_number: " + client_number);
   
   // Add the new client to our set
   clients.add(ws);
@@ -98,6 +101,7 @@ wss.on('connection', (ws) => {
   // Handle disconnection
   ws.on('close', () => {
     console.log('WebSocket connection closed');
+    client_number --;
     // Remove the client from our set
     clients.delete(ws);
   });
@@ -257,6 +261,7 @@ app.get('/api/:command', jsonParser, function(req, res){
             if (response.body.is_playing) {
               spotify_count++;
               authOptions.url = player_url + 'next';
+              logger('Spotify: next');
               request.post(authOptions, function(error, response, body) {
                 console.log("response-: " + response.statusCode);
                 res.sendStatus(response.statusCode);
@@ -265,6 +270,7 @@ app.get('/api/:command', jsonParser, function(req, res){
             }
             else {
               authOptions.url = player_url + 'play';
+              logger('Spotify:play');
               request.put(authOptions, function(error, response, body) {
                 console.log("response--: " + response.statusCode);
                 res.sendStatus(response.statusCode);
@@ -280,7 +286,7 @@ app.get('/api/:command', jsonParser, function(req, res){
       }
       else{
         request.post(authOptions, function(error, response, body) {
-          logger(`Spotify: ${command}`);
+          logger(`Spotify:${command}`);
 
           if (response.statusCode >= 200 && response.statusCode < 300){
             if (command == 'next'){spotify_count++;}
@@ -300,7 +306,7 @@ app.get('/api/:command', jsonParser, function(req, res){
 
 
     else if (command == 'play' || command == 'pause'){
-      logger(`Spotify: ${command}`);
+      logger(`Spotify:${command}`);
 
         request.put(authOptions, function(error, response, body) {
         res.json(response.statusCode);
@@ -309,14 +315,14 @@ app.get('/api/:command', jsonParser, function(req, res){
     }
 
     else if (command == 'playpause'){
-      logger(`Spotify: ${command}`);
+      logger(`Spotify:${command}`);
       authOptions.url = player_url + 'currently-playing'
 
       request.get(authOptions, function(error, response, body) {
         try {
           if (response.body.is_playing == false) {
             authOptions.url = player_url + 'play'
-            logger("Spotify: play");
+            logger("Spotify:play");
           }
           else if (response.body.is_playing == true) {
             authOptions.url = player_url + 'pause'
@@ -388,13 +394,10 @@ app.get('/gearshifter/:track_no', jsonParser, function(req, res){
 )
 
 
-app.get('/nback_watch_http/:answer', jsonParser, function(req, res){
+app.get('/nback_http/:answer', jsonParser, function(req, res){
 
   answer = req.params['answer']
-  console.log("answer: " + answer);
-  // logger(`N-back: ${answer}`);
-
-  broadcast(answer);
+  logger(`N-back: ${answer}`);
   res.sendFile('nback_participant.html', {root: path.join(__dirname, 'public')});
 
 })
@@ -402,7 +405,7 @@ app.get('/nback_watch_http/:answer', jsonParser, function(req, res){
 app.get('/nback_controller/:command', jsonParser, function(req, res){
 
   command = req.params['command']
-  broadcast(command);
+  logger(`N-back: ${command}`);
   res.sendFile('nback_researcher.html', {root: path.join(__dirname, 'public')});
   }
 )
@@ -419,7 +422,6 @@ app.get('/nback_index/:type', jsonParser, function(req, res){
 app.get('/nback/:command', jsonParser, function(req, res){
 
   command = req.params['command']
-  console.log("command: " + command);
 
   var player = require('play-sound')();
   player.play('./audio/' + command + '.mp3', (err) => {
@@ -436,11 +438,19 @@ app.get('/navi/:command', jsonParser, function(req, res){
 
   command = req.params['command']
   console.log("command: " + command);
-  broadcast(command);
   logger(`Navi_command: ${command}`);
 
   res.sendStatus(200);        
 })
+
+app.get('/printout/:comment', jsonParser, function(req, res){
+
+  comment = req.params['comment']
+  console.log("comment: " + comment);
+  res.sendStatus(200);        
+  }
+)
+
 
 
 app.get('/login', function(req, res) {

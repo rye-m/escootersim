@@ -19,15 +19,10 @@ void nback_button_setup(){
 
 void nback_button_loop() {
 
-
-  while (true){
-    webSocket.loop();
-    if (global_payload == "start_nback"){
-      sendRequest("nback",  "begin");
-      delay(2000);
-      nBackTask(0);
-      break;
-    }
-  
+  if (global_payload == "N-back: start_nback"){
+    sendRequest("nback",  "begin");
+    delay(2000);
+    global_payload = "";
+    nBackTask(0);
   }
 }

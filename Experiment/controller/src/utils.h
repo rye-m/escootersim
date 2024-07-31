@@ -27,6 +27,7 @@ WStype_t global_type;
 uint8_t yes[3] = {0x59, 0x65, 0x73};
 uint8_t no[2] = {0x4e, 0x65};
 String global_payload = "";
+bool nback_finish_flg = false;
 
 
 String flg;
@@ -138,11 +139,11 @@ bool playOrPause() {
     int res = sendRequest("api",  "currently-playing");
     
     if (res == 201) {
-        Serial.print("play");
+        // Serial.print("play");
         sendRequest("api",  "play");
     }
     else if (res == 202) {
-        Serial.print("pause");
+        // Serial.print("pause");
         sendRequest("api",  "pause");
     }
 
@@ -164,7 +165,6 @@ long generateRandomSequence(int length) {
     //     sequence.push_back(temp);
     //     Serial.print(temp);
     // }
-      Serial.println("");
     return temp;
 }
 
@@ -185,11 +185,11 @@ String YesOrNo_button(QwiicButton button){
           button.LEDoff();
           diff = millis() - start_time_pressed;
           if(diff <= 500){
-              Serial.println("no");
+              sendRequest("nback_http", "no");
               return "no";
           }
           else{
-              Serial.println("yes");
+              sendRequest("nback_http", "yes");
               return "yes";
           }
           break;
@@ -217,11 +217,11 @@ String YesOrNo_foot_button(int foot_button_pin){
           }
           diff = millis() - start_time_pressed;
           if(diff <= 500){
-              Serial.println("no");
+              sendRequest("nback_http", "no");
               return "no";
           }
           else{
-              Serial.println("yes");
+              sendRequest("nback_http", "yes");
               return "yes";
           }
           break;
@@ -287,11 +287,11 @@ String YesOrNo_throttle(int throttle_pin){
           }
           diff = millis() - start_time_pressed;
           if(diff <= 500){
-              Serial.println("no");
+              sendRequest("nback_http", "no");
               return "no";
           }
           else{
-              Serial.println("yes");
+              sendRequest("nback_http", "yes");
               return "yes";
           }
           break;
@@ -308,13 +308,12 @@ String YesOrNo_throttle(int throttle_pin){
 
 void react(String answer){
     sendRequest("nback", answer);
-    Serial.println(answer);
     delay(400);
 }
 
 bool assert_result(int i, int prev_num, int crnt_num, String userInput){
 
-    if (i = 1){
+    if (i == 1){
         if (userInput == "yes"){
             react("incorrect");
         }
@@ -387,11 +386,14 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
 			// webSocket.sendTXT("Connected");
 			break;
 		case WStype_TEXT:
-			Serial.printf("[WSc] get text: %s\n", payload);
+			// Serial.printf("[WSc] get text: %s\n", payload);
+      global_payload = "";
       global_payload = (char *)payload;
+			// Serial.println("global_payload: " + global_payload);
+      if(global_payload == "N-back: finish_nback"){
+        nback_finish_flg = true;
+      }
 
-			// Serial.print("global_payload: ");
-			// Serial.println(global_payload);
 			// send message to server
 			// webSocket.sendTXT("message here");
 			break;
@@ -406,7 +408,6 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
 		case WStype_FRAGMENT_BIN_START:
 		case WStype_FRAGMENT:
 		case WStype_FRAGMENT_FIN:
-      global_payload = "";
 			break;
 	}
 }
@@ -417,47 +418,26 @@ String YesOrNo_watch() {
   uint32_t  diff;
   String url = "/mode_server/Nback_watch";
 
-	webSocket.begin(ipaddress, port, url);
-	webSocket.onEvent(webSocketEvent);
-	// webSocket.setReconnectInterval(5000);
-
-
   start_time = millis();
   
   while(true){
     webSocket.loop();
-    if(global_type == WStype_TEXT){
-      if(global_payload == "yes"){
-        Serial.println("yes");
-        global_payload = "";
-        webSocket.disconnect();
-        return "yes"; //Buffer 59 65 73
-        break;
-      }
-      else if(global_payload == "no"){ 
-        Serial.println("no");
-        webSocket.disconnect();
-        return "no"; //Buffer 4e 6f
-        break;
-      }
-      else if(millis() - start_time > timeout){
-        Serial.print("global_payload: ");
-        Serial.println(global_payload);
-        webSocket.disconnect();
-        global_payload = "";
-        return "timeout";
-        break;
-      } 
+    if(global_payload == "N-back: yes"){
+      Serial.println("yes");
+      global_payload = "";
+      return "yes"; //Buffer 59 65 73
+      break;
     }
-    else{
-      if(millis() - start_time > timeout){
-        webSocket.disconnect();
-        global_payload = "";
-        return "timeout";
-        break;
-      } 
-        // Serial.println(global_payload);
+    else if(global_payload == "N-back: no"){ 
+      Serial.println("no");
+      return "no"; //Buffer 4e 6f
+      break;
     }
+    else if(millis() - start_time > timeout){
+      global_payload = "";
+      return "timeout";
+      break;
+    } 
   }
 }
 
@@ -507,17 +487,19 @@ void nBackTask(int input_type) {
   int previous_num = 99;
   String userInput;
 
-  while (global_payload != "finish_nback"){
-    webSocket.loop();
-    wholeCount ++;
 
+  while (!nback_finish_flg){
+    webSocket.loop();
+
+    wholeCount ++;
     previous_num = current_num;
     current_num = generateRandomSequence(1);
 
     sendRequest("nback", String(std::to_string(current_num).c_str()));
-    Serial.println("\n\"" + String(std::to_string(current_num).c_str()) + "\"");
+    webSocket.loop();
     delay(300);
-    Serial.print("Match? -> ");
+    webSocket.loop();
+
     switch (input_type)
     {
     case 0: // button
@@ -526,16 +508,15 @@ void nBackTask(int input_type) {
     case 1: // gearshifter
       userInput = YesOrNo_gearshifter(seesaw);
       break;
-    case 3:
+    case 3: // foot button
       userInput = YesOrNo_foot_button(foot_button_pin);
       break;
-    case 4:
+    case 4: // throttle
       userInput = YesOrNo_throttle(throttle_pin);
       break;
-    case 5:
+    case 5: // watch
       userInput = YesOrNo_watch();
       break;
-    
     default:
       break;
     }
@@ -543,14 +524,19 @@ void nBackTask(int input_type) {
     if (assert_result(wholeCount, previous_num, current_num, userInput)) {
         correctCount++;
     }
-    Serial.println(userInput);
+
+    webSocket.loop();
     delay(1000);
+    webSocket.loop();
   }
-  
+
     double accuracy = static_cast<double>(correctCount) / wholeCount * 100;
-    Serial.print("Accuracy: ");
-    Serial.print(accuracy);
-    sendRequest("nback", String(accuracy, DEC));
+    Serial.print("Accuracy: " + String(accuracy));
+    sendRequest("nback", "Total=" + String(wholeCount));
+    sendRequest("nback", "Correct count=" + String(correctCount));
+    sendRequest("nback", "Accuracy=" + String(accuracy, DEC));
     sendRequest("nback",  "end");
+
+    nback_finish_flg = false;
 }
 

@@ -76,7 +76,7 @@ void spotify_foot_button_setup(){
     Serial.println("Device acknowledged.");
   }
 
-  sendRequest("api",  "spotify_foot_button_connected");
+  sendRequest("printout",  "spotify_foot_button_connected");
 }
 
 

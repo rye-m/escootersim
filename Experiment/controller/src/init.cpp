@@ -39,20 +39,21 @@ bool log_valid(String text){
 
 
 bool loop_loop(void (*function)()) {
-        global_payload = "";
-        while(log_valid(global_payload)){
-            webSocket.loop();
-            (*function)();
-        }
-        return true;
+    global_payload = "";
+    while(log_valid(global_payload)){
+        webSocket.loop();
+        (*function)();
+    }
+    return true;
 
 }
 
 
 void setup(){
-    init_wifi();
+  init_wifi();
 	webSocket.begin(ipaddress, port);
 	webSocket.onEvent(webSocketEvent);
+	webSocket.setReconnectInterval(120000);
 }
 
 

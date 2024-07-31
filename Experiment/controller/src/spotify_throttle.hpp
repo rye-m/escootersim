@@ -65,7 +65,7 @@ void ButtonState_throttle(){
 }
 
 void spotify_throttle_setup(){
-  sendRequest("api",  "spotify_throttle_connected");
+  sendRequest("printout",  "spotify_throttle_connected");
 }
 
 void spotify_throttle_loop() {
