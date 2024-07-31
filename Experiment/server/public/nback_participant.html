@@ -13,13 +13,9 @@
 <body>
     <h4>N-back task: Control Interface</h4>
     <main class="container">
-        <!-- <ul class="top-btn" style="list-style: none; padding-left: 0;">
-            <li><a class="link-btn colorname1" href="http://192.168.1.103:8888/nback_watch_http/yes">Yes</a></li>
-            <li><a class="link-btn colorname2" href="http://192.168.1.103:8888/nback_watch_http/no">No</a></li>
-        </ul> -->
         <ul class="top-btn" style="list-style: none; padding-left: 0;">
-            <li><a class="link-btn colorname1" href="/nback_watch_http/yes">Yes</a></li>
-            <li><a class="link-btn colorname2" href="/nback_watch_http/no">No</a></li>
+            <li><a class="link-btn colorname1" href="/nback_http/yes">Yes</a></li>
+            <li><a class="link-btn colorname2" href="/nback_http/no">No</a></li>
         </ul>
 </div>
 
@@ -97,7 +93,7 @@
         function sendMessage(str) {
             // const input = document.getElementById('messageInput');
             const message = str;
-            fetch('http://192.168.1.103:3000/nback_watch_http')
+            fetch('http://192.168.1.103:3000/nback_http')
             socket.send(message);
             // input.value = '';
         }
