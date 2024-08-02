@@ -34,6 +34,7 @@ const generateRandomString = (length) => {
 }
 
 var stateKey = 'spotify_auth_state';
+const PING_INTERVAL = 120000; // 120 seconds
 
 const app = express();
 const server = http.createServer(app);
@@ -94,8 +95,22 @@ wss.on('connection', (ws) => {
     // Broadcast the message to all clients
     broadcast(`Client said: ${message}`);
   });
+  
+  const pingClients = () => {
+    clients.forEach(client => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.ping();
+      }
+    });
+  };
 
+  // Ping every 120 seconds
+  const pingInterval = setInterval(pingClients, PING_INTERVAL);
 
+  // Handle pings and pongs
+  ws.on('pong', () => {
+    console.log('Received pong from client');
+  });
 
 
   // Handle disconnection
@@ -106,6 +121,7 @@ wss.on('connection', (ws) => {
     clients.delete(ws);
   });
 
+  
   // Send a welcome message to the new client
   // ws.send('Welcome to the WebSocket server!');
   
@@ -246,11 +262,12 @@ app.get('/api/:command', jsonParser, function(req, res){
         logger(`Spotify: ${command}_failed`);
         
         var player = require('play-sound')();
-        player.play('./audio/Buzz.wav', (err) => {
+        player.play('./audio/error.mp3',{ afplay: ['-v', 100 ] /* lower volume for afplay on OSX */ }, (err) => {
         if (err) console.log(`Could not play sound: ${err}`);
         });
-        res.sendStatus(204)
-        return; // Exit the function if there's an error
+        if (mode = 'web'){ res.sendFile('spotify_web.html', {root: path.join(__dirname, 'public')})}
+        else {res.statusCode}    
+return; // Exit the function if there's an error
       }
       else if (command == 'next' && spotify_count == 1){
 
@@ -264,8 +281,9 @@ app.get('/api/:command', jsonParser, function(req, res){
               logger('Spotify: next');
               request.post(authOptions, function(error, response, body) {
                 console.log("response-: " + response.statusCode);
-                res.sendStatus(response.statusCode);
-                return; // Exit the function 
+                if (mode = 'web'){ res.sendFile('spotify_web.html', {root: path.join(__dirname, 'public')})}
+                else {res.statusCode}    
+                  return; // Exit the function 
                 })  
             }
             else {
@@ -273,7 +291,8 @@ app.get('/api/:command', jsonParser, function(req, res){
               logger('Spotify:play');
               request.put(authOptions, function(error, response, body) {
                 console.log("response--: " + response.statusCode);
-                res.sendStatus(response.statusCode);
+                if (mode = 'web'){ res.sendFile('spotify_web.html', {root: path.join(__dirname, 'public')})}
+                else {res.statusCode}    
                 return; // Exit the function 
                 })  
             }

@@ -22,6 +22,10 @@
 #include <nback_watch.hpp>
 #include <Arduino.h>
 
+const unsigned long PING_INTERVAL = 120000; // 120 seconds
+unsigned long lastPingTime = 0;
+
+
 
 bool log_valid(String text){
     if (text == "mode: Spotify_button"
@@ -39,12 +43,18 @@ bool log_valid(String text){
 
 
 bool loop_loop(void (*function)()) {
-    global_payload = "";
-    while(log_valid(global_payload)){
-        webSocket.loop();
-        (*function)();
-    }
-    return true;
+  global_payload = "";
+
+  if((millis() - lastPingTime) > PING_INTERVAL){
+    webSocket.sendTXT("Ping");
+    lastPingTime = millis();
+  }
+
+  while(log_valid(global_payload)){
+      webSocket.loop();
+      (*function)();
+  }
+  return true;
 
 }
 
@@ -53,7 +63,8 @@ void setup(){
   init_wifi();
 	webSocket.begin(ipaddress, port);
 	webSocket.onEvent(webSocketEvent);
-	webSocket.setReconnectInterval(120000);
+	// webSocket.setReconnectInterval(120000);
+  sendRequest("printout",  "ESP32_connected!");
 }
 
 
