@@ -78,4 +78,5 @@ Unity_essim/Library/PackageCache/
 *.gif
 
 # videos
-Videos/
+Videos/.DS_Store
+**/.DS_Store
