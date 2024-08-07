@@ -20,3 +20,7 @@ I'm using some slightly more esoteric tooling, feel free to use notebooks, etc. 
 - [marimo](https://marimo.io/) as a Jupyter notebook alternative
 - [Vega-Altair](https://altair-viz.github.io/) for plotting
 - [Polars](https://pola.rs/) instead of Pandas
+
+## Notes
+- high pass filter on the imu data
+- use STD or RMS rather than raw magnitude

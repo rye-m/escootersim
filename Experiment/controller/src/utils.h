@@ -16,7 +16,7 @@ WebSocketsClient webSocket;
 
 const int sequenceLength = 10;
 const int n = 1;
-const int timeout = 3000;
+const int timeout = 4000;
 const int foot_button_pin = A2; // analog pin connected to X output
 const int throttle_pin = A1; // analog pin connected to X output
 const int throttle_th = 2900; // thrashhold for the potentiometer of the throttle

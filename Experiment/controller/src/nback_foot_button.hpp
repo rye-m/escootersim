@@ -11,13 +11,15 @@ void nback_foot_button_setup(){
   }
   Serial.println("Foot button acknowledged.");
 
-  sendRequest("nback",  "connected");
+  sendRequest("printout",  "nback_footbutton_connected");
 }
 
 
 void nback_foot_button_loop() {
-	sendRequest("nback",  "begin");
-	delay(2000);
-
-	nBackTask(3);
+  if (global_payload == "N-back: start_nback"){
+    sendRequest("nback",  "begin");
+    delay(2000);
+    global_payload = "";
+    nBackTask(3);
+  }
 }
