@@ -40,6 +40,7 @@ void loop()
   Serial.print(map(analogRead(B_pin), 295, 700, 0, 100) / 100.00);
   Serial.print(",");
   Serial.print(map(analogRead(S_pin), 410, 813, 50, -45) / 100.00); // C: 622
+  Serial.print(",");
 
   Serial.print(accel.acceleration.x);
   Serial.print(",");
@@ -54,5 +55,5 @@ void loop()
   Serial.print(",");
   Serial.print(gyro.gyro.z);
   Serial.println();
-  delay(10);
+  delay(9);
 }

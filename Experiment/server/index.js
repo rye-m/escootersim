@@ -109,7 +109,7 @@ wss.on('connection', (ws) => {
 
   // Handle pings and pongs
   ws.on('pong', () => {
-    console.log('Received pong from client');
+    console.log('Pong!');
   });
 
 

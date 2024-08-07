@@ -13,12 +13,11 @@ void nback_button_setup(){
   //Start with the LED off
   button.LEDoff();
 
-  sendRequest("nback",  "connected");
+  sendRequest("printout",  "nback_button_connected");
 }
 
 
 void nback_button_loop() {
-
   if (global_payload == "N-back: start_nback"){
     sendRequest("nback",  "begin");
     delay(2000);
