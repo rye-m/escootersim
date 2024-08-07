@@ -40,19 +40,22 @@ bool log_valid(String text){
     else {return true;}    
 }
 
-
+void ping(){
+  if((millis() - lastPingTime) > PING_INTERVAL){
+    webSocket.sendTXT("Ping");
+    Serial.println("send Ping");
+    lastPingTime = millis();
+  }
+}
 
 bool loop_loop(void (*function)()) {
   global_payload = "";
-
-  if((millis() - lastPingTime) > PING_INTERVAL){
-    webSocket.sendTXT("Ping");
-    lastPingTime = millis();
-  }
+  ping();
 
   while(log_valid(global_payload)){
       webSocket.loop();
       (*function)();
+      ping();
   }
   return true;
 
@@ -99,7 +102,7 @@ void loop() {
         loop_loop(nback_throttle_loop);
       }
       else if(global_payload == "mode: Nback_watch"){ 
-        nback_throttle_setup();
+        nback_watch_setup();
         loop_loop(nback_watch_loop);
       }
     }
