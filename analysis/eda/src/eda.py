@@ -157,31 +157,55 @@ def __(alt, df):
         )
     )
 
+    brush = alt.selection_interval()
+
     row1 = alt.hconcat(
-        base.encode(color=alt.Color(
-            "ScenarioTime:Q", scale=alt.Scale(scheme="blues")
-                
-            )), 
-        base.encode(color=alt.Color(
-            "velocity_magnitude:Q", scale=alt.Scale(scheme="plasma")
-            )),
+        base.encode(
+            color=alt.condition(
+                brush,
+                alt.Color("ScenarioTime:Q", scale=alt.Scale(scheme="blues")),
+                alt.value('lightgray')
+            )
+        ),
+        base.encode(
+            color=alt.condition(
+                brush,
+                alt.Color("velocity_magnitude:Q", scale=alt.Scale(scheme="plasma")),
+                alt.value('lightgray')
+            )
+        )
     ).resolve_scale(color='independent')
 
     row2 = alt.hconcat(
-        base.encode(color=alt.Color(
-            "accel_magnitude:Q", scale=alt.Scale(scheme="blues")
-            )), 
-        base.encode(color=alt.Color(
-            "gyro_magnitude:Q", scale=alt.Scale(scheme="blues")
-            ))).resolve_scale(color='independent')
-    row1 & row2
+        base.encode(
+            color=alt.condition(
+                brush,
+                alt.Color("accel_magnitude:Q", scale=alt.Scale(scheme="blues")),
+                alt.value('lightgray')
+            )
+        ),
+        base.encode(
+            color=alt.condition(
+                brush,
+                alt.Color("gyro_magnitude:Q", scale=alt.Scale(scheme="blues")),
+                alt.value('lightgray')
+            )
+        )
+    ).resolve_scale(color='independent')
 
-    return base, row1, row2
+    timeline = (
+        alt.Chart(df)
+        .mark_rule()
+        .encode(
+            x='ScenarioTime:Q',
+            color=alt.Color("ScenarioTime:Q", scale=alt.Scale(scheme="blues"), legend=None)
+        )
+        .properties(width="container")
+        .add_params(brush)
+    )
 
-
-@app.cell
-def __():
-    return
+    row1 & row2 & timeline
+    return base, brush, row1, row2, timeline
 
 
 if __name__ == "__main__":
