@@ -1,10 +1,3 @@
-/*
- * WebSocketClient.ino
- *
- *  Created on: 24.05.2015
- *
- */
-
 #include <Arduino.h>
 
 #include <WiFi.h>
@@ -20,6 +13,7 @@ WiFiMulti WiFiMulti;
 
 void nback_watch_setup() {
 	Serial.setDebugOutput(true);
+  sendRequest("printout",  "nback_watch_connected");
 }
 
 void nback_watch_loop() {

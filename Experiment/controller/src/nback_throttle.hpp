@@ -8,19 +8,15 @@ void nback_throttle_setup(){
   }
   Serial.println("Device acknowledged.");
 
-  sendRequest("nback",  "connected");
+  sendRequest("printout",  "nback_throttle_connected");
 }
 
 
 void nback_throttle_loop() {
-
-  while (true){
-    webSocket.loop();
-    if (global_payload == "start_nback"){
-      sendRequest("nback",  "begin");
-      delay(2000);
-      nBackTask(4);
-      break;
-    }
+  if (global_payload == "N-back: start_nback"){
+    sendRequest("nback",  "begin");
+    delay(2000);
+    global_payload = "";
+    nBackTask(4);
   }
 }
