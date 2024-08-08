@@ -13,9 +13,21 @@ def __():
     from base64 import b64decode
     import struct
     import numpy as np
-    from scipy import signal
+    from scipy.signal import butter, filtfilt
     from scipy.fft import fft, fftfreq
-    return Path, alt, b64decode, fft, fftfreq, mo, np, pl, signal, struct
+    return (
+        Path,
+        alt,
+        b64decode,
+        butter,
+        fft,
+        fftfreq,
+        filtfilt,
+        mo,
+        np,
+        pl,
+        struct,
+    )
 
 
 @app.cell
@@ -269,17 +281,28 @@ def __(df, fft, fftfreq, np, pl):
             "accel_x": fft_accel_x,
             "accel_y": fft_accel_y,
             "accel_z": fft_accel_z,
+            "PSD_x": fft_accel_x**2/sample_rate,
+            "PSD_y": fft_accel_y**2/sample_rate,
+            "PSD_z": fft_accel_z**2/sample_rate,
             "freq_accel": freq_accel,
+            "time": df["ScenarioTime"].drop_nulls(),
         }
-    ).unpivot(index=["freq_accel"], on=["accel_y", "accel_x", "accel_z"]).filter(pl.col('value')< 200)
+    ).unpivot(index=["freq_accel", "time"], on=["accel_y", "accel_x", "accel_z", "PSD_x", "PSD_y", "PSD_z"])
+    # .filter((pl.col('value')< 100) & (pl.col('freq_accel') >0))
+
     gyro_data = pl.DataFrame(
         {
             "gyro_x": fft_gyro_x,
             "gyro_y": fft_gyro_y,
             "gyro_z": fft_gyro_z,
+            "PSD_x": fft_gyro_x**2/sample_rate,
+            "PSD_y": fft_gyro_y**2/sample_rate,
+            "PSD_z": fft_gyro_z**2/sample_rate,
             "freq_gyro": freq_gyro,
+            "time": df["ScenarioTime"].drop_nulls(),
         }
-    ).unpivot(index=["freq_gyro"], on=["gyro_y", "gyro_x", "gyro_z"]).filter(pl.col('value')< 100)
+    ).unpivot(index=["freq_gyro"], on=["gyro_y", "gyro_x", "gyro_z", "PSD_y", "PSD_x", "PSD_z"])
+    # .filter((pl.col('value')< 100) & (pl.col('freq_gyro') >0))
     return (
         accel_data,
         fft_accel_x,
@@ -297,32 +320,56 @@ def __(df, fft, fftfreq, np, pl):
 
 
 @app.cell
-def __():
+def __(gyro_data):
+    gyro_data
     return
 
 
 @app.cell
-def __(accel_data, alt):
+def __(accel_data, alt, pl):
     accel_chart = (
-        alt.Chart(accel_data)
+        alt.Chart(
+            accel_data.filter((pl.col("value") < 100) & (pl.col("freq_accel") > 0) & (pl.col("variable").str.contains('accel')))
+        )
         .mark_line()
         .encode(x="freq_accel:Q", y="value:Q", color="variable:N")
         .properties(title="Accelerometer FFT")
     )
-    accel_chart.show()
-    return accel_chart,
+
+    PSD_accel_chart = (
+        alt.Chart(
+            accel_data.filter((pl.col("value") < 1000) & (pl.col("freq_accel") > 0) &(pl.col("variable").str.contains('PSD')))
+        )
+        .mark_line()
+        .encode(x="freq_accel:Q", y="value:Q", color="variable:N")
+        .properties(title="Accelerometer PSD")
+    )
+
+    accel_chart | PSD_accel_chart
+    return PSD_accel_chart, accel_chart
 
 
 @app.cell
-def __(alt, gyro_data):
+def __(alt, gyro_data, pl):
     gyro_chart = (
-        alt.Chart(gyro_data)
+        alt.Chart(
+            gyro_data.filter((pl.col("value") < 100) & (pl.col("freq_gyro") > 0)  & (pl.col("variable").str.contains('gyro')))
+        )
         .mark_line()
         .encode(x="freq_gyro:Q", y="value:Q", color="variable:N")
         .properties(title="Gyroscope FFT")
     )
-    gyro_chart.show()
-    return gyro_chart,
+
+    PSD_gyro_chart = (
+        alt.Chart(
+            gyro_data.filter((pl.col("value") < 1000) & (pl.col("freq_gyro") > 0) & (pl.col("variable").str.contains('PSD')))
+        )
+        .mark_line()
+        .encode(x="freq_gyro:Q", y="value:Q", color="variable:N")
+        .properties(title="Gyroscope PSD")
+    )
+    gyro_chart | PSD_gyro_chart
+    return PSD_gyro_chart, gyro_chart
 
 
 @app.cell
@@ -341,6 +388,18 @@ def __(mo):
         -
         """
     )
+    return
+
+
+@app.cell
+def __(df):
+    df[['A escooter acc_x', 'A escooter acc_y', 'A escooter acc_z']].plot()
+    return
+
+
+@app.cell
+def __(df):
+    df.head()
     return
 
 
