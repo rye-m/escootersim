@@ -69,7 +69,6 @@ void ButtonState_foot_button(){
 }
 
 void spotify_foot_button_setup(){
-  // Serial.begin(112000);
   pinMode(foot_button_pin, INPUT_PULLUP);  // set our pin to an input with a pullup resistor
 
   if (digitalRead(foot_button_pin)) {

@@ -14,8 +14,8 @@ Adafruit_seesaw seesaw(&Wire1);
 const int sequenceLength = 10;
 const int n = 1;
 const int timeout = 3000;
-const int foot_button_pin = A1; // analog pin connected to X output
-const int throttle_pin = A2; // analog pin connected to X output
+const int foot_button_pin = A2; // analog pin connected to X output
+const int throttle_pin = A1; // analog pin connected to X output
 const int throttle_th = 2900; // thrashhold for the potentiometer of the throttle
 
 uint8_t brightness = 100;   //The brightness to set the LED to when the button is pushed
@@ -109,60 +109,62 @@ int six_down_end = 375;
 void setup() {
 
   Serial.begin(115200);
-  while (!Serial) delay(10);   // wait until serial port is opened
-  delay(1000);
+  pinMode(foot_button_pin, INPUT_PULLUP);  // set our pin to an input with a pullup resistor
+  // while (!Serial) delay(10);   // wait until serial port is opened
+  // delay(1000);
 
-  Serial.println(F("Adafruit PID 5295 I2C QT Slide Potentiometer test!"));
-  delay(1000);
+  // Serial.println(F("Adafruit PID 5295 I2C QT Slide Potentiometer test!"));
+  // delay(1000);
 
-  Wire1.begin();
-  while (!seesaw.begin(DEFAULT_I2C_ADDR)) {
-    Serial.println(F("seesaw not found!"));
-    delay(1000);
-  }
-  delay(500);
-  Serial.println(F("seesaw found!"));
+  // Wire1.begin();
+  // while (!seesaw.begin(DEFAULT_I2C_ADDR)) {
+  //   Serial.println(F("seesaw not found!"));
+  //   delay(1000);
+  // }
+  // delay(500);
+  // Serial.println(F("seesaw found!"));
 }
 
 
 void loop() {
-  int raw_val = seesaw.analogRead(ANALOGIN);
-  Serial.print(raw_val);
+  Serial.println(digitalRead(foot_button_pin));
+  // int raw_val = seesaw.analogRead(ANALOGIN);
+  // Serial.print(raw_val);
 
-  if (data[0] < raw_val){
-    if (raw_val < one_up_end){ shifter_no = 1; flg = "up";}
-    else if (two_up_bgn < raw_val and raw_val < two_up_end){ shifter_no = 2; flg = "up";}
-    else if (three_up_bgn < raw_val and raw_val < three_up_end){ shifter_no = 3; flg = "up";}
-    else if (four_up_bgn < raw_val and raw_val < four_up_end){ shifter_no = 4; flg = "up";}
-    else if (five_up_bgn < raw_val and raw_val < five_up_end){ shifter_no = 5; flg = "up";}
-    else if (six_up_bgn < raw_val){ shifter_no = 6; flg = "up";}
-    else {flg = "up";}
-  } 
-  else if (data[0] > raw_val){
-    if (raw_val < one_down_end){ shifter_no = 1; flg = "down";}
-    else if (two_down_bgn < raw_val and raw_val < two_down_end){ shifter_no = 2; flg = "down";}
-    else if (three_down_bgn < raw_val and raw_val < three_down_end){ shifter_no = 3; flg = "down";}
-    else if (four_down_bgn < raw_val and raw_val < four_down_end){ shifter_no = 4; flg = "down";}
-    else if (five_down_bgn < raw_val and raw_val < five_down_end){ shifter_no = 5; flg = "down";}
-    else if (six_down_bgn < raw_val){ shifter_no = 6; flg = "down";}
-    else {flg = "down";}
-  }
-  else {flg = "stay";}
+  // if (data[0] < raw_val){
+  //   if (raw_val < one_up_end){ shifter_no = 1; flg = "up";}
+  //   else if (two_up_bgn < raw_val and raw_val < two_up_end){ shifter_no = 2; flg = "up";}
+  //   else if (three_up_bgn < raw_val and raw_val < three_up_end){ shifter_no = 3; flg = "up";}
+  //   else if (four_up_bgn < raw_val and raw_val < four_up_end){ shifter_no = 4; flg = "up";}
+  //   else if (five_up_bgn < raw_val and raw_val < five_up_end){ shifter_no = 5; flg = "up";}
+  //   else if (six_up_bgn < raw_val){ shifter_no = 6; flg = "up";}
+  //   else {flg = "up";}
+  // } 
+  // else if (data[0] > raw_val){
+  //   if (raw_val < one_down_end){ shifter_no = 1; flg = "down";}
+  //   else if (two_down_bgn < raw_val and raw_val < two_down_end){ shifter_no = 2; flg = "down";}
+  //   else if (three_down_bgn < raw_val and raw_val < three_down_end){ shifter_no = 3; flg = "down";}
+  //   else if (four_down_bgn < raw_val and raw_val < four_down_end){ shifter_no = 4; flg = "down";}
+  //   else if (five_down_bgn < raw_val and raw_val < five_down_end){ shifter_no = 5; flg = "down";}
+  //   else if (six_down_bgn < raw_val){ shifter_no = 6; flg = "down";}
+  //   else {flg = "down";}
+  // }
+  // else {flg = "stay";}
 
-  Serial.print(",\t");
-  Serial.print(data[0]);
-  Serial.print(",\t");
-  Serial.print(shifter_no);
-  Serial.print(",\t");
-  Serial.println(flg);
+  // Serial.print(",\t");
+  // Serial.print(data[0]);
+  // Serial.print(",\t");
+  // Serial.print(shifter_no);
+  // Serial.print(",\t");
+  // Serial.println(flg);
 
-  for (int i = 0; i < 9; i++) {
-    new_data[i] = data[i+1];
-  }
-  new_data[9] = raw_val;
-  for (int i = 0; i < 10; i++){
-      data[i] = new_data[i];
-  }
+  // for (int i = 0; i < 9; i++) {
+  //   new_data[i] = data[i+1];
+  // }
+  // new_data[9] = raw_val;
+  // for (int i = 0; i < 10; i++){
+  //     data[i] = new_data[i];
+  // }
 }
 
 

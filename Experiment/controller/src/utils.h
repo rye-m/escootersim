@@ -213,7 +213,7 @@ String YesOrNo_foot_button(int foot_button_pin){
       if(! digitalRead(foot_button_pin)){  
           start_time_pressed = millis();
           while (! digitalRead(foot_button_pin)){
-            // Serial.print(".");
+            Serial.print(digitalRead(foot_button_pin));
           }
           diff = millis() - start_time_pressed;
           if(diff <= 500){
