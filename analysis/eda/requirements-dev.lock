@@ -106,6 +106,7 @@ numpy==2.0.1
     # via hvplot
     # via pandas
     # via pyarrow
+    # via scipy
 packaging==24.1
     # via altair
     # via bokeh
@@ -178,6 +179,8 @@ rpds-py==0.19.1
     # via referencing
 ruff==0.5.6
     # via marimo
+scipy==1.14.0
+    # via eda
 six==1.16.0
     # via asttokens
     # via bleach

@@ -13,7 +13,9 @@ def __():
     from base64 import b64decode
     import struct
     import numpy as np
-    return Path, alt, b64decode, mo, np, pl, struct
+    from scipy import signal
+    from scipy.fft import fft, fftfreq
+    return Path, alt, b64decode, fft, fftfreq, mo, np, pl, signal, struct
 
 
 @app.cell
@@ -49,7 +51,6 @@ def __(df_raw, pl, struct):
             .bin.decode("base64")
             .map_elements(lambda x: struct.unpack("f", x[8:12])[0], pl.Float64)
             .alias("z_pos"),
-            
             pl.col("A escooter velocity")
             .cast(pl.Binary)
             .bin.decode("base64")
@@ -65,7 +66,6 @@ def __(df_raw, pl, struct):
             .bin.decode("base64")
             .map_elements(lambda x: struct.unpack("f", x[8:12])[0], pl.Float64)
             .alias("z_vel"),
-
             pl.col("A escooter Rot")
             .cast(pl.Binary)
             .bin.decode("base64")
@@ -87,7 +87,9 @@ def __(df_raw, pl, struct):
     df = df.with_columns(
         (
             (
-                pl.col("A escooter acc_x") ** 2 + pl.col("A escooter acc_y") ** 2 + pl.col("A escooter acc_z") ** 2
+                pl.col("A escooter acc_x") ** 2
+                + pl.col("A escooter acc_y") ** 2
+                + pl.col("A escooter acc_z") ** 2
             ).sqrt()
         ).alias("accel_magnitude")
     )
@@ -95,7 +97,9 @@ def __(df_raw, pl, struct):
     df = df.with_columns(
         (
             (
-                pl.col("A escooter rot_x") ** 2 + pl.col("A escooter rot_y") ** 2 + pl.col("A escooter rot_z") ** 2
+                pl.col("A escooter rot_x") ** 2
+                + pl.col("A escooter rot_y") ** 2
+                + pl.col("A escooter rot_z") ** 2
             ).sqrt()
         ).alias("gyro_magnitude")
     )
@@ -108,7 +112,10 @@ def __(df_raw, pl, struct):
         ).alias("velocity_magnitude")
     )
 
-
+    df = df.with_columns(
+        rolling_std_accel=pl.col("accel_magnitude").rolling_std(window_size=5),
+        rolling_std_gyro=pl.col("gyro_magnitude").rolling_std(window_size=5),
+    )
 
     df = df.with_row_index()
     return df,
@@ -122,14 +129,12 @@ def __(mo):
 
 @app.cell
 def __():
-    # df[['gyro_magnitude', 'accel_magnitude']].plot()
     return
 
 
 @app.cell
 def __(df):
-
-    df.head(4) 
+    df.head(4)
     return
 
 
@@ -164,41 +169,45 @@ def __(alt, df):
             color=alt.condition(
                 brush,
                 alt.Color("ScenarioTime:Q", scale=alt.Scale(scheme="blues")),
-                alt.value('lightgray')
+                alt.value("lightgray"),
             )
         ),
         base.encode(
             color=alt.condition(
                 brush,
-                alt.Color("velocity_magnitude:Q", scale=alt.Scale(scheme="plasma")),
-                alt.value('lightgray')
+                alt.Color(
+                    "velocity_magnitude:Q", scale=alt.Scale(scheme="plasma")
+                ),
+                alt.value("lightgray"),
             )
-        )
-    ).resolve_scale(color='independent')
+        ),
+    ).resolve_scale(color="independent")
 
     row2 = alt.hconcat(
         base.encode(
             color=alt.condition(
                 brush,
-                alt.Color("accel_magnitude:Q", scale=alt.Scale(scheme="blues")),
-                alt.value('lightgray')
+                alt.Color("rolling_std_accel:Q", scale=alt.Scale(scheme="blues")),
+                alt.value("lightgray"),
             )
         ),
         base.encode(
             color=alt.condition(
                 brush,
-                alt.Color("gyro_magnitude:Q", scale=alt.Scale(scheme="blues")),
-                alt.value('lightgray')
+                alt.Color("rolling_std_gyro:Q", scale=alt.Scale(scheme="blues")),
+                alt.value("lightgray"),
             )
-        )
-    ).resolve_scale(color='independent')
+        ),
+    ).resolve_scale(color="independent")
 
     timeline = (
         alt.Chart(df)
         .mark_rule()
         .encode(
-            x='ScenarioTime:Q',
-            color=alt.Color("ScenarioTime:Q", scale=alt.Scale(scheme="blues"), legend=None)
+            x="ScenarioTime:Q",
+            color=alt.Color(
+                "ScenarioTime:Q", scale=alt.Scale(scheme="blues"), legend=None
+            ),
         )
         .properties(width="container")
         .add_params(brush)
@@ -206,6 +215,138 @@ def __(alt, df):
 
     row1 & row2 & timeline
     return base, brush, row1, row2, timeline
+
+
+@app.cell
+def __(mo):
+    mo.md(
+        r"""
+        ## Frequency Analyis
+
+        fft on logged data isn't so helpful because the sample rate is too low to pick up any interesting peaks.
+        """
+    )
+    return
+
+
+@app.cell
+def __(df, fft, fftfreq, np, pl):
+    sample_rate = 1 / df.select(pl.col("ScenarioTime").diff()).mean()[0, 0]
+    nyquist_frequency = sample_rate / 2
+
+
+    fft_accel_x = np.abs(
+        fft(df["A escooter acc_x"].drop_nulls().drop_nans().to_numpy())
+    )
+    fft_accel_y = np.abs(
+        fft(df["A escooter acc_y"].drop_nulls().drop_nans().to_numpy())
+    )
+    fft_accel_z = np.abs(
+        fft(df["A escooter acc_z"].drop_nulls().drop_nans().to_numpy())
+    )
+
+    fft_gyro_x = np.abs(
+        fft(df["A escooter rot_x"].drop_nulls().drop_nans().to_numpy())
+    )
+    fft_gyro_y = np.abs(
+        fft(df["A escooter rot_y"].drop_nulls().drop_nans().to_numpy())
+    )
+    fft_gyro_z = np.abs(
+        fft(df["A escooter rot_z"].drop_nulls().drop_nans().to_numpy())
+    )
+
+    freq_accel = fftfreq(
+        len(df["A escooter acc_x"].drop_nulls().drop_nans().to_numpy()),
+        1 / sample_rate,
+    )
+    freq_gyro = fftfreq(
+        len(df["A escooter rot_x"].drop_nulls().drop_nans().to_numpy()),
+        1 / sample_rate,
+    )
+
+    accel_data = pl.DataFrame(
+        {
+            "accel_x": fft_accel_x,
+            "accel_y": fft_accel_y,
+            "accel_z": fft_accel_z,
+            "freq_accel": freq_accel,
+        }
+    ).unpivot(index=["freq_accel"], on=["accel_y", "accel_x", "accel_z"]).filter(pl.col('value')< 200)
+    gyro_data = pl.DataFrame(
+        {
+            "gyro_x": fft_gyro_x,
+            "gyro_y": fft_gyro_y,
+            "gyro_z": fft_gyro_z,
+            "freq_gyro": freq_gyro,
+        }
+    ).unpivot(index=["freq_gyro"], on=["gyro_y", "gyro_x", "gyro_z"]).filter(pl.col('value')< 100)
+    return (
+        accel_data,
+        fft_accel_x,
+        fft_accel_y,
+        fft_accel_z,
+        fft_gyro_x,
+        fft_gyro_y,
+        fft_gyro_z,
+        freq_accel,
+        freq_gyro,
+        gyro_data,
+        nyquist_frequency,
+        sample_rate,
+    )
+
+
+@app.cell
+def __():
+    return
+
+
+@app.cell
+def __(accel_data, alt):
+    accel_chart = (
+        alt.Chart(accel_data)
+        .mark_line()
+        .encode(x="freq_accel:Q", y="value:Q", color="variable:N")
+        .properties(title="Accelerometer FFT")
+    )
+    accel_chart.show()
+    return accel_chart,
+
+
+@app.cell
+def __(alt, gyro_data):
+    gyro_chart = (
+        alt.Chart(gyro_data)
+        .mark_line()
+        .encode(x="freq_gyro:Q", y="value:Q", color="variable:N")
+        .properties(title="Gyroscope FFT")
+    )
+    gyro_chart.show()
+    return gyro_chart,
+
+
+@app.cell
+def __(mo):
+    mo.md("""## Survey Analysis""")
+    return
+
+
+@app.cell
+def __(mo):
+    mo.md(
+        r"""
+        ## Other Analysis
+
+        - Distance from optimal path?
+        -
+        """
+    )
+    return
+
+
+@app.cell
+def __():
+    return
 
 
 if __name__ == "__main__":

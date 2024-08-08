@@ -91,6 +91,7 @@ numpy==2.0.1
     # via hvplot
     # via pandas
     # via pyarrow
+    # via scipy
 packaging==24.1
     # via altair
     # via bokeh
@@ -154,6 +155,8 @@ requests==2.32.3
 rpds-py==0.19.1
     # via jsonschema
     # via referencing
+scipy==1.14.0
+    # via eda
 six==1.16.0
     # via asttokens
     # via bleach

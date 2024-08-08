@@ -9,6 +9,7 @@ dependencies = [
     "polars>=1.4.1",
     "altair[all]>=5.3.0",
     "hvplot>=0.10.0",
+    "scipy>=1.14.0",
 ]
 readme = "README.md"
 requires-python = ">= 3.8"
