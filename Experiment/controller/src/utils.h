@@ -203,13 +203,18 @@ String YesOrNo_button(QwiicButton button){
   }            
 }
 
+
+
 String YesOrNo_foot_button(int foot_button_pin){
   uint32_t  start_time;
   uint32_t  start_time_pressed;
   uint32_t  diff;
+  uint32_t  LastTimerTick_foot_nback;
+
 
   start_time = millis();
   while (true) {
+
       if(! digitalRead(foot_button_pin)){  
           start_time_pressed = millis();
           while (! digitalRead(foot_button_pin)){

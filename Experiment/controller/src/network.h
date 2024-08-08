@@ -25,7 +25,8 @@ int sendRequest(String path) {
   HTTPClient http;
 
   String serverPath = "http://" + ipaddress + ":" + port + "/" + path;
-  Serial.print("URL: ");  Serial.print(serverPath);
+  uint32_t time_stamp = millis();
+  Serial.print("[" +  String(std::to_string(time_stamp).c_str())); Serial.print("] URL: ");  Serial.print(serverPath);
   // Your Domain name with URL path or IP address with path
   http.begin(serverPath.c_str());
   
@@ -36,7 +37,8 @@ int sendRequest(String path) {
   int httpResponseCode = http.GET();
   
   if (httpResponseCode == 200) {
-    Serial.print("HTTP Response code: "); Serial.println(httpResponseCode);
+    uint32_t time_stamp = millis();
+    Serial.print("[" +  String(std::to_string(time_stamp).c_str())); Serial.print("] HTTP Response code: "); Serial.println(httpResponseCode);
   }
   else {
     Serial.print("Error code: ");
@@ -55,13 +57,11 @@ int sendRequest(String path, String command) {
   HTTPClient http;
 
   String serverPath = "http://" + ipaddress + ":" + port + "/" + path + "/" + command;
-  Serial.print("URL: ");  Serial.print(serverPath);
+  uint32_t time_stamp = millis();
+  Serial.print("[" + String(std::to_string(time_stamp).c_str())); Serial.print("] URL: ");  Serial.print(serverPath);
   Serial.print(",\tcommand: ");  Serial.println(command);
   // Your Domain name with URL path or IP address with path
   http.begin(serverPath.c_str());
-  
-  // If you need Node-RED/server authentication, insert user and password below
-  //http.setAuthorization("REPLACE_WITH_SERVER_USERNAME", "REPLACE_WITH_SERVER_PASSWORD");
   
   // Specify content-type header
   // http.addHeader("Content-Type", "application/json");
@@ -73,7 +73,8 @@ int sendRequest(String path, String command) {
   int httpResponseCode = http.GET();
   
   if (httpResponseCode == 200) {
-    Serial.print("HTTP Response code: "); Serial.println(httpResponseCode);
+    uint32_t time_stamp = millis();
+    Serial.print("[" +  String(std::to_string(time_stamp).c_str())); Serial.print("] HTTP Response code: "); Serial.println(httpResponseCode);
   }
   else {
     Serial.print("Error code: ");

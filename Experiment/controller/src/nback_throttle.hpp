@@ -15,7 +15,7 @@ void nback_throttle_setup(){
 void nback_throttle_loop() {
   if (global_payload == "N-back: start_nback"){
     sendRequest("nback",  "begin");
-    delay(2000);
+    delay(3000);
     global_payload = "";
     nBackTask(4);
   }

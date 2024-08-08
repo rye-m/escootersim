@@ -20,7 +20,7 @@ void nback_button_setup(){
 void nback_button_loop() {
   if (global_payload == "N-back: start_nback"){
     sendRequest("nback",  "begin");
-    delay(2000);
+    delay(3000);
     global_payload = "";
     nBackTask(0);
   }
