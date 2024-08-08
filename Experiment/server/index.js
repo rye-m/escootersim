@@ -83,7 +83,7 @@ wss.on('connection', (ws) => {
 
   // Handle incoming messages
   ws.on('message', (message) => {
-    console.log('Received:', message);
+    console.log('Received:', message.toString());
 
     // Broadcast the message to all clients
     broadcast(`Client said: ${message}`);
@@ -104,13 +104,13 @@ wss.on('connection', (ws) => {
     });
   };
 
-  // Ping every 120 seconds
-  const pingInterval = setInterval(pingClients, PING_INTERVAL);
+  // // Ping every 120 seconds
+  // const pingInterval = setInterval(pingClients, PING_INTERVAL);
 
-  // Handle pings and pongs
-  ws.on('pong', () => {
-    console.log('Pong!');
-  });
+  // // Handle pings and pongs
+  // ws.on('pong', () => {
+  //   console.log('Pong!');
+  // });
 
 
   // Handle disconnection
