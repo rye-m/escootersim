@@ -10,15 +10,20 @@ def __():
     import polars as pl
     import altair as alt
     from pathlib import Path
-    from base64 import b64decode
+    from base64 import b64decode, b64encode
     import struct
     import numpy as np
     from scipy.signal import butter, filtfilt
     from scipy.fft import fft, fftfreq
+    from PIL import Image
+    from io import BytesIO
     return (
+        BytesIO,
+        Image,
         Path,
         alt,
         b64decode,
+        b64encode,
         butter,
         fft,
         fftfreq,
@@ -31,11 +36,15 @@ def __():
 
 
 @app.cell
-def __(Path, pl):
+def __(BytesIO, Image, Path, b64encode, pl):
     data_path = Path("./src/Data/")
     sample_data = data_path / "Sample_data.csv"
     df_raw = pl.read_csv(sample_data, separator=";")
-    return data_path, df_raw, sample_data
+    pil_image = Image.open(data_path / 'map.png')
+    output = BytesIO()
+    pil_image.save(output, format='PNG')
+    b64_image = "data:image/png;base64," + b64encode(output.getvalue()).decode()
+    return b64_image, data_path, df_raw, output, pil_image, sample_data
 
 
 @app.cell
@@ -162,7 +171,7 @@ def __(alt, df):
         base.encode(
             color=alt.condition(
                 brush,
-                alt.Color("ScenarioTime:Q", scale=alt.Scale(scheme="blues")),
+                alt.Color("A escooter steering:Q", scale=alt.Scale(scheme="blueorange")),
                 alt.value("lightgray"),
             )
         ),
@@ -207,7 +216,7 @@ def __(alt, df):
         .add_params(brush)
     )
 
-    row1 & row2 & timeline
+    row1 & timeline
     return base, brush, row1, row2, timeline
 
 
@@ -390,8 +399,8 @@ def __(mo):
 
 
 @app.cell
-def __(df):
-    df[["A escooter acc_x", "A escooter acc_y", "A escooter acc_z"]].plot()
+def __():
+    # df[["A escooter acc_x", "A escooter acc_y", "A escooter acc_z"]].plot()
     return
 
 
@@ -429,15 +438,14 @@ def __(butter, df, filtfilt, np, pl, sample_rate):
         "high_y": high_y,
         "high_z": high_z,
         "high_mag": np.sqrt(high_x**2 + high_y**2 + high_z**2)
-        
+
     })
 
     accel_filter_testing = accel_filter_testing.with_columns(
         std_low_mag = pl.col('low_mag').rolling_std(window_size=5).fill_null(0),
         std_high_mag = pl.col('high_mag').rolling_std(window_size=5).fill_null(0),
-        
-    )
 
+    )
     return (
         accel_filter_testing,
         butterworth_filter,
@@ -449,6 +457,12 @@ def __(butter, df, filtfilt, np, pl, sample_rate):
         low_y,
         low_z,
     )
+
+
+@app.cell
+def __(mo):
+    mo.md("""### Acceleration data split by high and low frequencies""")
+    return
 
 
 @app.cell
@@ -504,13 +518,13 @@ def __(
         "high_y": gyro_high_y,
         "high_z": gyro_high_z,
         "high_mag": np.sqrt(high_x**2 + high_y**2 + high_z**2)
-        
+
     })
 
     gyro_filter_testing = gyro_filter_testing.with_columns(
         std_low_mag = pl.col('low_mag').rolling_std(window_size=5).fill_null(0),
         std_high_mag = pl.col('high_mag').rolling_std(window_size=5).fill_null(0),
-        
+
     )
     return (
         gyro_filter_testing,
@@ -521,6 +535,12 @@ def __(
         gyro_low_y,
         gyro_low_z,
     )
+
+
+@app.cell
+def __(mo):
+    mo.md("""### Gyro data split by high and low frequencies""")
+    return
 
 
 @app.cell
@@ -539,8 +559,47 @@ def __(alt, gyro_filter_testing):
 
 
 @app.cell
-def __(df):
-    df.head()
+def __(mo):
+    mo.md("""### Some map overlay testing""")
+    return
+
+
+@app.cell
+def __(alt, df):
+    map = (
+        alt.Chart(df)
+        .mark_circle(size=15)
+        .encode(
+            alt.X("x_pos:Q"),
+            alt.Y("z_pos:Q"),
+            tooltip=['x_pos:Q','z_pos:Q' ]
+        )
+    )
+    map
+    return map,
+
+
+@app.cell
+def __(alt, b64_image, map, pl):
+    PLOT_SIZE = 370
+
+    image_chart = alt.Chart(pl.DataFrame({'url': [b64_image]})).mark_image(
+        width=alt.expr('width'),
+        height=alt.expr('height')
+    ).encode(
+        url='url:N',
+         x=alt.XDatum(2).scale(domain=[-100,100]),
+        y=alt.YDatum(-4).scale(domain=[-100,100]),
+    ).properties(
+        width=PLOT_SIZE,
+        height=PLOT_SIZE,
+    )
+    image_chart + map
+    return PLOT_SIZE, image_chart
+
+
+@app.cell
+def __():
     return
 
 
