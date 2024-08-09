@@ -40,7 +40,7 @@ def __(BytesIO, Image, Path, b64encode, pl):
     data_path = Path("./src/Data/")
     sample_data = data_path / "Sample_data.csv"
     df_raw = pl.read_csv(sample_data, separator=";")
-    pil_image = Image.open(data_path / 'map.png')
+    pil_image = Image.open(data_path / 'map2.png')
     output = BytesIO()
     pil_image.save(output, format='PNG')
     b64_image = "data:image/png;base64," + b64encode(output.getvalue()).decode()
@@ -570,8 +570,8 @@ def __(alt, df):
         alt.Chart(df)
         .mark_circle(size=15)
         .encode(
-            alt.X("x_pos:Q"),
-            alt.Y("z_pos:Q"),
+            alt.X("x_pos:Q").scale(domain=[-100,100]),
+            alt.Y("z_pos:Q").scale(domain=[-100,100]),
             tooltip=['x_pos:Q','z_pos:Q' ]
         )
     )
@@ -581,31 +581,16 @@ def __(alt, df):
 
 @app.cell
 def __(alt, b64_image, map, pl):
-    PLOT_SIZE = 370
-
     image_chart = alt.Chart(pl.DataFrame({'url': [b64_image]})).mark_image(
         width=alt.expr('width'),
-        height=alt.expr('height')
+        height=alt.expr('height'),
     ).encode(
         url='url:N',
-         x=alt.XDatum(2).scale(domain=[-100,100]),
-        y=alt.YDatum(-4).scale(domain=[-100,100]),
-    ).properties(
-        width=PLOT_SIZE,
-        height=PLOT_SIZE,
+         x=alt.XDatum(0).scale(domain=[-100,100]),
+        y=alt.YDatum(0).scale(domain=[-100,100]),
     )
     image_chart + map
-    return PLOT_SIZE, image_chart
-
-
-@app.cell
-def __():
-    return
-
-
-@app.cell
-def __():
-    return
+    return image_chart,
 
 
 if __name__ == "__main__":
