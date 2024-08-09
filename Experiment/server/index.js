@@ -65,12 +65,15 @@ function broadcast(message) {
 
 
 function logger(log_message){
-  // time_stamp = Math.floor(+new Date() / 1000)
+  var hrTime = process.hrtime()
+  time_stamp = Date.now() //hrTime[0] * 1000000 + hrTime[1] / 1000
   // broadcast(`${time_stamp}: ${log_message}`);
-  console.log("broadcast: " + log_message);
+  console.log(`broadcast[${time_stamp}]: ` + log_message);
   broadcast(`${log_message}`);
 }
-
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 // WebSocket connection handler
 wss.on('connection', (ws) => {
@@ -83,7 +86,7 @@ wss.on('connection', (ws) => {
 
   // Handle incoming messages
   ws.on('message', (message) => {
-    console.log('Received:', message);
+    console.log('Received:', message.toString());
 
     // Broadcast the message to all clients
     broadcast(`Client said: ${message}`);
@@ -104,13 +107,13 @@ wss.on('connection', (ws) => {
     });
   };
 
-  // Ping every 120 seconds
-  const pingInterval = setInterval(pingClients, PING_INTERVAL);
+  // // Ping every 120 seconds
+  // const pingInterval = setInterval(pingClients, PING_INTERVAL);
 
-  // Handle pings and pongs
-  ws.on('pong', () => {
-    console.log('Pong!');
-  });
+  // // Handle pings and pongs
+  // ws.on('pong', () => {
+  //   console.log('Pong!');
+  // });
 
 
   // Handle disconnection
@@ -265,6 +268,7 @@ app.get('/api/:command', jsonParser, function(req, res){
         player.play('./audio/error.mp3',{ afplay: ['-v', 100 ] /* lower volume for afplay on OSX */ }, (err) => {
         if (err) console.log(`Could not play sound: ${err}`);
         });
+        // sleep(1000);
         if (mode = 'web'){ res.sendFile('spotify_web.html', {root: path.join(__dirname, 'public')})}
         else {res.statusCode}    
 return; // Exit the function if there's an error
@@ -441,13 +445,16 @@ app.get('/nback_index/:type', jsonParser, function(req, res){
 app.get('/nback/:command', jsonParser, function(req, res){
 
   command = req.params['command']
-
+  logger(`N-back: ${command}`);
+  logger(`N-back: start loading sound`);
   var player = require('play-sound')();
+  logger(`N-back: start playing sound`);
   player.play('./audio/' + command + '.mp3', (err) => {
       if (err) console.log(`Could not play sound: ${err}`);
   });
-  logger(`N-back: ${command}`);
+  logger(`N-back: finish playing sound`);
 
+  sleep(1000)
   res.sendStatus(200);        
 
 })
