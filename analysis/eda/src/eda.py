@@ -140,26 +140,8 @@ def __(mo):
 
 
 @app.cell
-def __():
-    return
-
-
-@app.cell
 def __(df):
     df.head(4)
-    return
-
-
-@app.cell
-def __(mo):
-    mo.md(
-        """
-        ## Visualizations
-        ### TODO
-        - high pass filter on the imu data
-        - use STD or RMS rather than raw magnitude
-        """
-    )
     return
 
 
@@ -281,13 +263,16 @@ def __(df, fft, fftfreq, np, pl):
             "accel_x": fft_accel_x,
             "accel_y": fft_accel_y,
             "accel_z": fft_accel_z,
-            "PSD_x": fft_accel_x**2/sample_rate,
-            "PSD_y": fft_accel_y**2/sample_rate,
-            "PSD_z": fft_accel_z**2/sample_rate,
+            "PSD_x": fft_accel_x**2 / sample_rate,
+            "PSD_y": fft_accel_y**2 / sample_rate,
+            "PSD_z": fft_accel_z**2 / sample_rate,
             "freq_accel": freq_accel,
             "time": df["ScenarioTime"].drop_nulls(),
         }
-    ).unpivot(index=["freq_accel", "time"], on=["accel_y", "accel_x", "accel_z", "PSD_x", "PSD_y", "PSD_z"])
+    ).unpivot(
+        index=["freq_accel", "time"],
+        on=["accel_y", "accel_x", "accel_z", "PSD_x", "PSD_y", "PSD_z"],
+    )
     # .filter((pl.col('value')< 100) & (pl.col('freq_accel') >0))
 
     gyro_data = pl.DataFrame(
@@ -295,13 +280,16 @@ def __(df, fft, fftfreq, np, pl):
             "gyro_x": fft_gyro_x,
             "gyro_y": fft_gyro_y,
             "gyro_z": fft_gyro_z,
-            "PSD_x": fft_gyro_x**2/sample_rate,
-            "PSD_y": fft_gyro_y**2/sample_rate,
-            "PSD_z": fft_gyro_z**2/sample_rate,
+            "PSD_x": fft_gyro_x**2 / sample_rate,
+            "PSD_y": fft_gyro_y**2 / sample_rate,
+            "PSD_z": fft_gyro_z**2 / sample_rate,
             "freq_gyro": freq_gyro,
             "time": df["ScenarioTime"].drop_nulls(),
         }
-    ).unpivot(index=["freq_gyro"], on=["gyro_y", "gyro_x", "gyro_z", "PSD_y", "PSD_x", "PSD_z"])
+    ).unpivot(
+        index=["freq_gyro"],
+        on=["gyro_y", "gyro_x", "gyro_z", "PSD_y", "PSD_x", "PSD_z"],
+    )
     # .filter((pl.col('value')< 100) & (pl.col('freq_gyro') >0))
     return (
         accel_data,
@@ -320,16 +308,14 @@ def __(df, fft, fftfreq, np, pl):
 
 
 @app.cell
-def __(gyro_data):
-    gyro_data
-    return
-
-
-@app.cell
 def __(accel_data, alt, pl):
     accel_chart = (
         alt.Chart(
-            accel_data.filter((pl.col("value") < 100) & (pl.col("freq_accel") > 0) & (pl.col("variable").str.contains('accel')))
+            accel_data.filter(
+                (pl.col("value") < 100)
+                & (pl.col("freq_accel") > 0)
+                & (pl.col("variable").str.contains("accel"))
+            )
         )
         .mark_line()
         .encode(x="freq_accel:Q", y="value:Q", color="variable:N")
@@ -338,7 +324,11 @@ def __(accel_data, alt, pl):
 
     PSD_accel_chart = (
         alt.Chart(
-            accel_data.filter((pl.col("value") < 1000) & (pl.col("freq_accel") > 0) &(pl.col("variable").str.contains('PSD')))
+            accel_data.filter(
+                (pl.col("value") < 1000)
+                & (pl.col("freq_accel") > 0)
+                & (pl.col("variable").str.contains("PSD"))
+            )
         )
         .mark_line()
         .encode(x="freq_accel:Q", y="value:Q", color="variable:N")
@@ -353,7 +343,11 @@ def __(accel_data, alt, pl):
 def __(alt, gyro_data, pl):
     gyro_chart = (
         alt.Chart(
-            gyro_data.filter((pl.col("value") < 100) & (pl.col("freq_gyro") > 0)  & (pl.col("variable").str.contains('gyro')))
+            gyro_data.filter(
+                (pl.col("value") < 100)
+                & (pl.col("freq_gyro") > 0)
+                & (pl.col("variable").str.contains("gyro"))
+            )
         )
         .mark_line()
         .encode(x="freq_gyro:Q", y="value:Q", color="variable:N")
@@ -362,7 +356,11 @@ def __(alt, gyro_data, pl):
 
     PSD_gyro_chart = (
         alt.Chart(
-            gyro_data.filter((pl.col("value") < 1000) & (pl.col("freq_gyro") > 0) & (pl.col("variable").str.contains('PSD')))
+            gyro_data.filter(
+                (pl.col("value") < 100)
+                & (pl.col("freq_gyro") > 0)
+                & (pl.col("variable").str.contains("PSD"))
+            )
         )
         .mark_line()
         .encode(x="freq_gyro:Q", y="value:Q", color="variable:N")
@@ -393,8 +391,151 @@ def __(mo):
 
 @app.cell
 def __(df):
-    df[['A escooter acc_x', 'A escooter acc_y', 'A escooter acc_z']].plot()
+    df[["A escooter acc_x", "A escooter acc_y", "A escooter acc_z"]].plot()
     return
+
+
+@app.cell
+def __(butter, df, filtfilt, np, pl, sample_rate):
+    def butterworth_filter(data, cutoff, fs, order=5, btype="low"):
+        nyquist = 0.5 * fs
+        normal_cutoff = cutoff / nyquist
+        b, a = butter(order, normal_cutoff, btype=btype, analog=False)
+        y = filtfilt(b, a, data)
+        return y
+
+
+    low_cutoff = 2
+    low_x = butterworth_filter(df["A escooter acc_x"].drop_nans().drop_nulls().to_numpy()-9.8, low_cutoff, sample_rate)
+    low_y = butterworth_filter(df["A escooter acc_y"].drop_nans().drop_nulls().to_numpy(), low_cutoff, sample_rate)
+    low_z = butterworth_filter(df["A escooter acc_z"].drop_nans().drop_nulls().to_numpy(), low_cutoff, sample_rate)
+
+    high_x = butterworth_filter(df["A escooter acc_x"].drop_nans().drop_nulls().to_numpy()-9.8, low_cutoff, sample_rate, btype="high")
+    high_y = butterworth_filter(df["A escooter acc_y"].drop_nans().drop_nulls().to_numpy(), low_cutoff, sample_rate, btype="high")
+    high_z = butterworth_filter(df["A escooter acc_z"].drop_nans().drop_nulls().to_numpy(), low_cutoff, sample_rate, btype="high")
+
+    accel_filter_testing = pl.DataFrame({
+        "time": df['ScenarioTime'].drop_nans().drop_nulls(),
+        'x_pos': df['x_pos'].drop_nans().drop_nulls(),
+        'z_pos': df['z_pos'].drop_nans().drop_nulls(),
+        "acc_x": df["A escooter acc_x"].drop_nans().drop_nulls()- 9.8,
+        "acc_y": df["A escooter acc_y"].drop_nans().drop_nulls(),
+        "acc_z": df["A escooter acc_x"].drop_nans().drop_nulls(),
+        "low_x": low_x,
+        "low_y": low_y,
+        "low_z": low_z,
+        "low_mag": np.sqrt(low_x**2 + low_y**2 + low_z**2),
+        "high_x": high_x,
+        "high_y": high_y,
+        "high_z": high_z,
+        "high_mag": np.sqrt(high_x**2 + high_y**2 + high_z**2)
+        
+    })
+
+    accel_filter_testing = accel_filter_testing.with_columns(
+        std_low_mag = pl.col('low_mag').rolling_std(window_size=5).fill_null(0),
+        std_high_mag = pl.col('high_mag').rolling_std(window_size=5).fill_null(0),
+        
+    )
+
+    return (
+        accel_filter_testing,
+        butterworth_filter,
+        high_x,
+        high_y,
+        high_z,
+        low_cutoff,
+        low_x,
+        low_y,
+        low_z,
+    )
+
+
+@app.cell
+def __(accel_filter_testing, alt):
+    base2 = (
+        alt.Chart(accel_filter_testing)
+        .mark_circle()
+        .encode(
+            x="x_pos",
+            y="z_pos",
+            color = alt.Color("std_high_mag:Q", scale=alt.Scale(scheme="blues")),
+        )
+    )
+    alt.hconcat(base2, base2.encode(color = alt.Color("std_low_mag:Q", scale=alt.Scale(scheme="blues")))).resolve_scale(color='independent')
+    return base2,
+
+
+@app.cell
+def __(
+    butterworth_filter,
+    df,
+    high_x,
+    high_y,
+    high_z,
+    low_cutoff,
+    low_x,
+    low_y,
+    low_z,
+    np,
+    pl,
+    sample_rate,
+):
+    gyro_low_x = butterworth_filter(df["A escooter rot_x"].drop_nans().drop_nulls().to_numpy(), low_cutoff, sample_rate)
+    gyro_low_y = butterworth_filter(df["A escooter rot_y"].drop_nans().drop_nulls().to_numpy(), low_cutoff, sample_rate)
+    gyro_low_z = butterworth_filter(df["A escooter rot_z"].drop_nans().drop_nulls().to_numpy(), low_cutoff, sample_rate)
+
+    gyro_high_x = butterworth_filter(df["A escooter rot_x"].drop_nans().drop_nulls().to_numpy(), low_cutoff, sample_rate, btype="high")
+    gyro_high_y = butterworth_filter(df["A escooter rot_y"].drop_nans().drop_nulls().to_numpy(), low_cutoff, sample_rate, btype="high")
+    gyro_high_z = butterworth_filter(df["A escooter rot_z"].drop_nans().drop_nulls().to_numpy(), low_cutoff, sample_rate, btype="high")
+
+    gyro_filter_testing = pl.DataFrame({
+        "time": df['ScenarioTime'].drop_nans().drop_nulls(),
+        'x_pos': df['x_pos'].drop_nans().drop_nulls(),
+        'z_pos': df['z_pos'].drop_nans().drop_nulls(),
+        "rot_x": df["A escooter rot_x"].drop_nans().drop_nulls(),
+        "rot_y": df["A escooter rot_y"].drop_nans().drop_nulls(),
+        "rot_z": df["A escooter rot_x"].drop_nans().drop_nulls(),
+        "low_x": gyro_low_x,
+        "low_y": gyro_low_y,
+        "low_z": gyro_low_z,
+        "low_mag": np.sqrt(low_x**2 + low_y**2 + low_z**2),
+        "high_x": gyro_high_x,
+        "high_y": gyro_high_y,
+        "high_z": gyro_high_z,
+        "high_mag": np.sqrt(high_x**2 + high_y**2 + high_z**2)
+        
+    })
+
+    gyro_filter_testing = gyro_filter_testing.with_columns(
+        std_low_mag = pl.col('low_mag').rolling_std(window_size=5).fill_null(0),
+        std_high_mag = pl.col('high_mag').rolling_std(window_size=5).fill_null(0),
+        
+    )
+    return (
+        gyro_filter_testing,
+        gyro_high_x,
+        gyro_high_y,
+        gyro_high_z,
+        gyro_low_x,
+        gyro_low_y,
+        gyro_low_z,
+    )
+
+
+@app.cell
+def __(alt, gyro_filter_testing):
+    base3 = (
+        alt.Chart(gyro_filter_testing)
+        .mark_circle()
+        .encode(
+            x="x_pos",
+            y="z_pos",
+            color = alt.Color("std_high_mag:Q", scale=alt.Scale(scheme="blues")),
+        )
+    )
+    alt.hconcat(base3, base3.encode(color = alt.Color("std_low_mag:Q", scale=alt.Scale(scheme="blues")))).resolve_scale(color='independent')
+    return base3,
 
 
 @app.cell
