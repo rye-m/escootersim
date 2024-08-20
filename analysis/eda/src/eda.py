@@ -10,41 +10,37 @@ def __():
     import polars as pl
     import altair as alt
     from pathlib import Path
-    from base64 import b64decode, b64encode
+    from base64 import b64decode
     import struct
     import numpy as np
     from scipy.signal import butter, filtfilt
     from scipy.fft import fft, fftfreq
-    from PIL import Image
-    from io import BytesIO
+    from utils.plotting import image_to_altair
+    from utils.process_sim_csv import process_csv
     return (
-        BytesIO,
-        Image,
         Path,
         alt,
         b64decode,
-        b64encode,
         butter,
         fft,
         fftfreq,
         filtfilt,
+        image_to_altair,
         mo,
         np,
         pl,
+        process_csv,
         struct,
     )
 
 
 @app.cell
-def __(BytesIO, Image, Path, b64encode, pl):
-    data_path = Path("./src/Data/")
+def __(Path, image_to_altair, pl):
+    data_path = Path("./Data/")
     sample_data = data_path / "Sample_data.csv"
     df_raw = pl.read_csv(sample_data, separator=";")
-    pil_image = Image.open(data_path / 'map2.png')
-    output = BytesIO()
-    pil_image.save(output, format='PNG')
-    b64_image = "data:image/png;base64," + b64encode(output.getvalue()).decode()
-    return b64_image, data_path, df_raw, output, pil_image, sample_data
+    b64_image = image_to_altair(data_path / "map2.png", data_path/ "b64_map2.txt")
+    return b64_image, data_path, df_raw, sample_data
 
 
 @app.cell
@@ -54,91 +50,8 @@ def __(mo):
 
 
 @app.cell
-def __(df_raw, pl, struct):
-    df = df_raw.with_columns(
-        [
-            pl.col("A escooter Pos")
-            .cast(pl.Binary)
-            .bin.decode("base64")
-            .map_elements(lambda x: struct.unpack("f", x[0:4])[0], pl.Float64)
-            .alias("x_pos"),
-            pl.col("A escooter Pos")
-            .cast(pl.Binary)
-            .bin.decode("base64")
-            .map_elements(lambda x: struct.unpack("f", x[4:8])[0], pl.Float64)
-            .alias("y_pos"),
-            pl.col("A escooter Pos")
-            .cast(pl.Binary)
-            .bin.decode("base64")
-            .map_elements(lambda x: struct.unpack("f", x[8:12])[0], pl.Float64)
-            .alias("z_pos"),
-            pl.col("A escooter velocity")
-            .cast(pl.Binary)
-            .bin.decode("base64")
-            .map_elements(lambda x: struct.unpack("f", x[0:4])[0], pl.Float64)
-            .alias("x_vel"),
-            pl.col("A escooter velocity")
-            .cast(pl.Binary)
-            .bin.decode("base64")
-            .map_elements(lambda x: struct.unpack("f", x[4:8])[0], pl.Float64)
-            .alias("y_vel"),
-            pl.col("A escooter velocity")
-            .cast(pl.Binary)
-            .bin.decode("base64")
-            .map_elements(lambda x: struct.unpack("f", x[8:12])[0], pl.Float64)
-            .alias("z_vel"),
-            pl.col("A escooter Rot")
-            .cast(pl.Binary)
-            .bin.decode("base64")
-            .map_elements(lambda x: struct.unpack("f", x[0:4])[0], pl.Float64)
-            .alias("vehicle x_Rot"),
-            pl.col("A escooter velocity")
-            .cast(pl.Binary)
-            .bin.decode("base64")
-            .map_elements(lambda x: struct.unpack("f", x[4:8])[0], pl.Float64)
-            .alias("vehicle y_Rot"),
-            pl.col("A escooter velocity")
-            .cast(pl.Binary)
-            .bin.decode("base64")
-            .map_elements(lambda x: struct.unpack("f", x[8:12])[0], pl.Float64)
-            .alias("vehicle z_Rot"),
-        ]
-    )
-
-    df = df.with_columns(
-        (
-            (
-                pl.col("A escooter acc_x") ** 2
-                + pl.col("A escooter acc_y") ** 2
-                + pl.col("A escooter acc_z") ** 2
-            ).sqrt()
-        ).alias("accel_magnitude")
-    )
-
-    df = df.with_columns(
-        (
-            (
-                pl.col("A escooter rot_x") ** 2
-                + pl.col("A escooter rot_y") ** 2
-                + pl.col("A escooter rot_z") ** 2
-            ).sqrt()
-        ).alias("gyro_magnitude")
-    )
-
-    df = df.with_columns(
-        (
-            (
-                pl.col("x_vel") ** 2 + pl.col("y_vel") ** 2 + pl.col("z_vel") ** 2
-            ).sqrt()
-        ).alias("velocity_magnitude")
-    )
-
-    df = df.with_columns(
-        rolling_std_accel=pl.col("accel_magnitude").rolling_std(window_size=5),
-        rolling_std_gyro=pl.col("gyro_magnitude").rolling_std(window_size=5),
-    )
-
-    df = df.with_row_index()
+def __(process_csv, sample_data):
+    df = process_csv(sample_data)
     return df,
 
 
@@ -591,6 +504,11 @@ def __(alt, b64_image, map, pl):
     )
     image_chart + map
     return image_chart,
+
+
+@app.cell
+def __():
+    return
 
 
 if __name__ == "__main__":

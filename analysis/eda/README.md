@@ -7,8 +7,13 @@ If you export the questionnaire from Qualtrics you can use this [fx](https://fx.
 ```bash
 cat QUALTRICS.qsf | fx 'Object.entries(this.SurveyElements[0].Payload).map(([k,v])=>({
   block: v.Description,
+  flowID: v.Flow
   questionIDs: v.BlockElements.filter(e => e.Type === "Question").map(e => e.QuestionID)
 }))' > QID_map.json
+```
+
+```bash
+cat QUALTRICS.qsf |  fx '.SurveyElements[1].Payload.Flow.find(a=>a.FlowID=="FL_65").Flow.map(({FlowID, Description})=>({FlowID, Description}))' > FlowMap.json
 ```
 
 ## Tooling

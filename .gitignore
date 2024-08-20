@@ -80,3 +80,6 @@ Unity_essim/Library/PackageCache/
 # videos
 Videos/.DS_Store
 **/.DS_Store
+
+#ignore all qualtrics exports
+*Scooterseim*
