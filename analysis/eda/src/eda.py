@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.7.17"
+__generated_with = "0.8.0"
 app = marimo.App(width="medium")
 
 
@@ -16,12 +16,13 @@ def __():
     from scipy.signal import butter, filtfilt
     from scipy.fft import fft, fftfreq
     from utils.plotting import image_to_altair
-    from utils.process_sim_csv import process_csv
+    from utils.process_sim_csv import process_csv, expand_encoded_data
     return (
         Path,
         alt,
         b64decode,
         butter,
+        expand_encoded_data,
         fft,
         fftfreq,
         filtfilt,
@@ -50,8 +51,10 @@ def __(mo):
 
 
 @app.cell
-def __(process_csv, sample_data):
+def __(expand_encoded_data, process_csv, sample_data):
     df = process_csv(sample_data)
+    df = expand_encoded_data(df)
+    df
     return df,
 
 
@@ -99,22 +102,22 @@ def __(alt, df):
         ),
     ).resolve_scale(color="independent")
 
-    row2 = alt.hconcat(
-        base.encode(
-            color=alt.condition(
-                brush,
-                alt.Color("rolling_std_accel:Q", scale=alt.Scale(scheme="blues")),
-                alt.value("lightgray"),
-            )
-        ),
-        base.encode(
-            color=alt.condition(
-                brush,
-                alt.Color("rolling_std_gyro:Q", scale=alt.Scale(scheme="blues")),
-                alt.value("lightgray"),
-            )
-        ),
-    ).resolve_scale(color="independent")
+    # row2 = alt.hconcat(
+    #     base.encode(
+    #         color=alt.condition(
+    #             brush,
+    #             alt.Color("rolling_std_accel:Q", scale=alt.Scale(scheme="blues")),
+    #             alt.value("lightgray"),
+    #         )
+    #     ),
+    #     base.encode(
+    #         color=alt.condition(
+    #             brush,
+    #             alt.Color("rolling_std_gyro:Q", scale=alt.Scale(scheme="blues")),
+    #             alt.value("lightgray"),
+    #         )
+    #     ),
+    # ).resolve_scale(color="independent")
 
     timeline = (
         alt.Chart(df)
@@ -130,7 +133,7 @@ def __(alt, df):
     )
 
     row1 & timeline
-    return base, brush, row1, row2, timeline
+    return base, brush, row1, timeline
 
 
 @app.cell

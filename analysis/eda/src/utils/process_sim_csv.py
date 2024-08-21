@@ -140,4 +140,7 @@ def read_trials(path):
     
     combined_df = pl.concat(dataframes)
     combined_df = expand_encoded_data(combined_df)
+    combined_df = combined_df.drop(["A escooter Pos", "A escooter velocity", "A escooter Rot", "]GameTime", "FrameRate", "FrameRate-XRDevice", "Frame Number"])
+    combined_df = combined_df.filter(pl.col("ScenarioTime").is_not_null())
+
     return combined_df

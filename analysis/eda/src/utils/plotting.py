@@ -11,3 +11,10 @@ def image_to_altair(image_path, outfile=None):
         with open(outfile, 'w') as f:
             f.write(b64_image)
     return b64_image
+
+def downsample(df, rate=None):
+    MAX_ROWS = 20000
+    if rate:
+        return df[::rate]
+    rate = df.shape[0] // MAX_ROWS
+    return df[::rate +1]
