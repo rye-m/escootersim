@@ -117,7 +117,7 @@ class Prototype(Enum):
 
 def get_scenario(path):
     path_str = str(path)
-    task = next((task for task in Task if task.value in path_str), None)
+    task = next((task for task in Task if task.value in path_str), Task.PRACTICE)
     prototype = next((proto for proto in Prototype if proto.value in path_str), Prototype.CONTROL)
 
     return task, prototype
@@ -136,11 +136,15 @@ def read_trials(path):
     dataframes = []
     for trial in trial_paths:
         df = process_csv(trial)
+        if "]GameTime" in df.columns:
+            df = df.drop(["]GameTime"])
+        else:
+            df = df.drop(["GameTime"])
         dataframes.append(df)
     
     combined_df = pl.concat(dataframes)
     combined_df = expand_encoded_data(combined_df)
-    combined_df = combined_df.drop(["A escooter Pos", "A escooter velocity", "A escooter Rot", "]GameTime", "FrameRate", "FrameRate-XRDevice", "Frame Number"])
+    combined_df = combined_df.drop(["A escooter Pos", "A escooter velocity", "A escooter Rot", "FrameRate", "FrameRate-XRDevice", "Frame Number"])
     combined_df = combined_df.filter(pl.col("ScenarioTime").is_not_null())
 
     return combined_df
