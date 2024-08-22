@@ -509,10 +509,5 @@ def __(alt, b64_image, map, pl):
     return image_chart,
 
 
-@app.cell
-def __():
-    return
-
-
 if __name__ == "__main__":
     app.run()

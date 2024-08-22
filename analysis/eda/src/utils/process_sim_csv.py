@@ -148,3 +148,11 @@ def read_trials(path):
     combined_df = combined_df.filter(pl.col("ScenarioTime").is_not_null())
 
     return combined_df
+
+def scenario_df(df,task= None, prototype= None):
+    if(task is None):
+        return df.filter(pl.col('Prototype') == prototype.value)
+    if(prototype is None):
+        return df.filter(pl.col('Task') == task.value)
+    else:
+        return df.filter((pl.col('Task') == task.value) & (pl.col('Prototype') == prototype.value))

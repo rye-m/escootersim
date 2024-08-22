@@ -29,3 +29,15 @@ I'm using some slightly more esoteric tooling, feel free to use notebooks, etc. 
 ## Notes
 - high pass filter on the imu data
 - use STD or RMS rather than raw magnitude
+
+Running [example_participant.py](./src/example_participant.py) requires updating the max output bytes run 
+
+`export MARIMO_OUTPUT_MAX_BYTES=10_000_000`
+
+then 
+
+`marimo edit eda/src/example_participant.py`
+
+
+## measures
+- nback delay?
