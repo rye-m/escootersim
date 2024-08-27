@@ -66,8 +66,13 @@ def __(data_dir, get_flow_data, get_participant_data, participant_id):
 @app.cell
 def __(participant_dir, read_trials):
     study_df = read_trials(participant_dir)
-    study_df.head()
     return study_df,
+
+
+@app.cell
+def __(study_df):
+    study_df
+    return
 
 
 @app.cell
@@ -244,38 +249,18 @@ def __(alt, facet_base1):
 
 
 @app.cell
-def __(Prototype, Task, scenario_df, study_df):
-    test_df = scenario_df(study_df, task=Task.SONG, prototype=Prototype.VOICE)
-    return test_df,
-
-
-@app.cell
-def __(test_df):
-    test_df["Websocket_message_action"].drop_nulls().to_list()
-    return
-
-
-@app.cell
-def __():
-    import re
-
-    nback_look_up = (
-        [
-            ("\s[0-9]", "N_BACK_DIGIT"),
-            ("yes|no", "N_BACK_CLIENT_RESPONSE"),
-            ("Accuracy=", "N_BACK_CLIENT_ACCURACY"),
-            ("Total=", "N_BACK_CLIENT_TOTAL"),
-            ("end", "N_BACK_MCU_END"),
-            ("begin", "N_BACK_MCU_BEGIN")(
-                "start_nback", "N_BACK_START_COMMAND_BY_RESEARCHER"
-            ),
-            ("finish_nback", "N_BACK_END_COMMAND_BY_RESEARCHER")("ping", "PING"),
-            ("correct|incorrect", "N_BACK_SERVER_RESPONSE"),
-        ],
+def __(mo):
+    mo.md(
+        """
+        ## SCHEMA
+        # # SONG_USER_PLAY_PAUSE => 0 = PAUSE, 1 =PLAY
+        # # SONG_RESEARCHER_PLAY_PAUSE => 0 = PAUSE, 1 =PLAY
+        # # SONG_PLAYPAUSE_ACK => 0 = PAUSE,1=PLAY
+        # # SONG_NEXT_PREVIOUS => -1=Previous , 1 = Next
+        # # SONG_OOB => -1=Previous , 1 = Next
+        """
     )
-
-    song_look_up = [("play", "SONG_PLAY")]
-    return nback_look_up, re, song_look_up
+    return
 
 
 if __name__ == "__main__":
