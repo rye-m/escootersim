@@ -139,8 +139,9 @@ def process_csv(path):
             df = fix_song_logging(df, prototype)
     
     if task == Task.PRACTICE and prototype == Prototype.CONTROL:
-        df = df.with_columns(pl.lit(None).alias("ws_action"))
-        df = df.with_columns(pl.lit(None).alias("ws_value"))
+        df = df.with_columns(pl.lit(None).cast(pl.String).alias("ws_action"))
+        df = df.with_columns(pl.lit(None).cast(pl.Decimal).alias("ws_value"))
+    df = df.drop(["Websocket_message_category", "Websocket_message_action"])
     return df
 
 def read_trials(path):
@@ -320,3 +321,18 @@ def fix_song_logging(df, prototype):
             )
     df = df.with_columns(pl.col("ws_value").cast(pl.Decimal(precision=None, scale=0)))
     return df
+
+def combine_dataset(data_dir, output=None):
+    participants = data_dir.glob("P*")
+    dfs = []
+    for participant in participants:
+        # print(participant.name)
+        df = read_trials(participant)
+        df = df.with_columns(pl.lit(participant.name).alias("participantID"))
+        dfs.append(df)
+    combined_df = pl.concat(dfs)
+    if output is not None:
+        combined_df.write_csv(output + '.csv')
+        combined_df.write_parquet(output + '.parquet')
+         
+    return combined_df

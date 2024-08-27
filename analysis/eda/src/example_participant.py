@@ -19,6 +19,7 @@ def __():
         process_csv,
         get_scenario,
         scenario_df,
+        combine_dataset,
     )
     from utils.plotting import downsample
     return (
@@ -26,6 +27,7 @@ def __():
         Prototype,
         Task,
         alt,
+        combine_dataset,
         downsample,
         get_flow_data,
         get_order,
@@ -64,14 +66,71 @@ def __(data_dir, get_flow_data, get_participant_data, participant_id):
 
 
 @app.cell
+def __(pl, read_trials):
+    def combine_dataset2(data_dir, output=None):
+        participants = data_dir.glob("P*")
+        dfs = []
+        for participant in participants:
+            # print(participant.name)
+            df = read_trials(participant)
+            df = df.with_columns(pl.lit(participant.name).alias("participantID"))
+            dfs.append(df)
+        combined_df = pl.concat(dfs)
+        if output is not None:
+            combined_df.write_csv(output + '.csv')
+            combined_df.write_parquet(output + '.parquet', compression_level = 22)
+
+        return combined_df
+    return combine_dataset2,
+
+
+@app.cell
+def __(combine_dataset2, data_dir):
+    combined_df = combine_dataset2(data_dir, str(data_dir/ "combined_dataset"))
+    # combined_df = combined_df.with_columns(pl.col('Prototype').cast(pl.Enum(list(combined_df['Prototype'].unique()))))
+    return combined_df,
+
+
+@app.cell
+def __():
+    # list(combined_df['Prototype'].unique())
+    return
+
+
+@app.cell
+def __():
+    # combined_df.head()
+    return
+
+
+@app.cell
 def __(participant_dir, read_trials):
     study_df = read_trials(participant_dir)
-    return study_df,
+    s1 = study_df.estimated_size()
+    s1
+    return s1, study_df
+
+
+@app.cell
+def __(pl, study_df):
+    s2 = study_df.with_columns(
+        pl.col('Prototype').cast(pl.Enum(list(study_df['Prototype'].unique()))),
+        pl.col('Task').cast(pl.Enum(list(study_df['Task'].unique()))),
+        pl.col("ws_action").cast(pl.Categorical)
+    ).estimated_size()
+    s2
+    return s2,
 
 
 @app.cell
 def __(study_df):
-    study_df
+    study_df.columns
+    return
+
+
+@app.cell
+def __(s1, s2):
+    s2/s1
     return
 
 
