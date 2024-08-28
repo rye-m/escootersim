@@ -168,7 +168,7 @@ def read_trials(path):
         ]
     )
     combined_df = combined_df.filter(pl.col("ScenarioTime").is_not_null())
-
+    combined_df = combined_df.with_columns(pl.col('ws_value').cast(pl.Float64))
     return combined_df
 
 
