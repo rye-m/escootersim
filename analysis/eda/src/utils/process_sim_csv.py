@@ -128,6 +128,10 @@ def get_scenario(path):
 
 def process_csv(path):
     df = pl.read_csv(path, separator=";")
+    if "]GameTime" in df.columns:
+        df = df.drop(["]GameTime"])
+    else:
+        df = df.drop(["GameTime"])
     task, prototype = get_scenario(path)
     if prototype:
         df = df.with_columns(pl.lit(prototype.value).alias("Prototype"))
@@ -142,22 +146,9 @@ def process_csv(path):
         df = df.with_columns(pl.lit(None).cast(pl.String).alias("ws_action"))
         df = df.with_columns(pl.lit(None).cast(pl.Decimal).alias("ws_value"))
     df = df.drop(["Websocket_message_category", "Websocket_message_action"])
-    return df
 
-def read_trials(path):
-    trial_paths = Path(path).glob("CSV_Scenario-*.csv")
-    dataframes = []
-    for trial in trial_paths:
-        df = process_csv(trial)
-        if "]GameTime" in df.columns:
-            df = df.drop(["]GameTime"])
-        else:
-            df = df.drop(["GameTime"])
-        dataframes.append(df)
-
-    combined_df = pl.concat(dataframes)
-    combined_df = expand_encoded_data(combined_df)
-    combined_df = combined_df.drop(
+    df = expand_encoded_data(df)
+    df = df.drop(
         [
             "A escooter Pos",
             "A escooter velocity",
@@ -167,8 +158,19 @@ def read_trials(path):
             "Frame Number",
         ]
     )
-    combined_df = combined_df.filter(pl.col("ScenarioTime").is_not_null())
-    combined_df = combined_df.with_columns(pl.col('ws_value').cast(pl.Float64))
+    df = df.filter(pl.col("ScenarioTime").is_not_null())
+    df = df.with_columns(pl.col('ws_value').cast(pl.Float64))
+
+    return df
+
+def read_trials(path):
+    trial_paths = Path(path).glob("CSV_Scenario-*.csv")
+    dataframes = []
+    for trial in trial_paths:
+        df = process_csv(trial)
+        dataframes.append(df)
+
+    combined_df = pl.concat(dataframes)
     return combined_df
 
 
