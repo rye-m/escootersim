@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.8.0"
+__generated_with = "0.8.3"
 app = marimo.App(width="medium")
 
 
@@ -51,9 +51,8 @@ def __(mo):
 
 
 @app.cell
-def __(expand_encoded_data, process_csv, sample_data):
+def __(process_csv, sample_data):
     df = process_csv(sample_data)
-    df = expand_encoded_data(df)
     df
     return df,
 

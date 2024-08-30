@@ -9,18 +9,26 @@ def __():
     import marimo as mo
     import polars as pl
     import altair as alt
-    from utils.plotting import downsample
+    from utils.plotting import downsample, image_to_altair
     from utils.process_sim_csv import Prototype, Task, process_csv
     from itertools import product
     from pathlib import Path
-    # alt.data_transformers.enable("vegafusion")
+    data_path = Path("./Data/")
+    b64_image = image_to_altair(data_path / "map2.png", data_path/ "b64_map2.txt")
+    df = pl.read_parquet("./Data/combined_dataset.parquet")
+    out_path = Path("./Figures/")
     return (
         Path,
         Prototype,
         Task,
         alt,
+        b64_image,
+        data_path,
+        df,
         downsample,
+        image_to_altair,
         mo,
+        out_path,
         pl,
         process_csv,
         product,
@@ -28,10 +36,8 @@ def __():
 
 
 @app.cell
-def __(Path, pl):
-    df = pl.read_parquet("./Data/combined_dataset.parquet")
-    out_path = Path("./Figures/")
-    return df, out_path
+def __():
+    return
 
 
 @app.cell
@@ -177,12 +183,20 @@ def __(Task, df, downsample, pl):
 def __(Path, process_csv):
     optimal_path_path = Path('./Data/Optimal_path.csv')
     optimal_df = process_csv(optimal_path_path)
+    optimal_df.write_csv('./Data/Optimal_path_expanded.csv')
     return optimal_df, optimal_path_path
 
 
+app._unparsable_cell(
+    r"""
+    optimal_df.
+    """,
+    name="__"
+)
+
+
 @app.cell
-def __(optimal_df):
-    optimal_df
+def __():
     return
 
 

@@ -66,6 +66,51 @@ def __(data_dir, get_flow_data, get_participant_data, participant_id):
 
 
 @app.cell
+def __(mo, study_df):
+    task = mo.ui.dropdown(list(study_df["Task"].unique()), value="Nback")
+    proto = mo.ui.dropdown(list(study_df["Prototype"].unique()), value="Button")
+    mo.md(f"Examine Condition {task}, {proto}")
+    return proto, task
+
+
+@app.cell
+def __():
+    return
+
+
+@app.cell
+def __(alt, pl, proto, study_df, task):
+    condition_df = study_df.filter(
+        pl.col("Task").eq(task.selected_key)
+        & pl.col("Prototype").eq(proto.selected_key)
+    )
+    route = (
+        alt.Chart(condition_df)
+        .mark_circle(size=30)
+        .encode(
+            alt.X("x_pos:Q").scale(domain=[-100, 100]),
+            alt.Y("z_pos:Q").scale(domain=[-100, 100]),
+            alt.Color("velocity_magnitude"),
+        )
+    )
+
+    points = (
+        alt.Chart(
+            condition_df.filter(pl.col("ws_action").eq("NBACK_CLIENT_RESPONSE"))
+        )
+        .mark_circle(color="yellow", size=50)
+        .encode(
+            alt.X("x_pos:Q").scale(domain=[-100, 100]),
+            alt.Y("z_pos:Q").scale(domain=[-100, 100]),
+        )
+    )
+
+
+    (route + points).interactive()
+    return condition_df, points, route
+
+
+@app.cell
 def __():
     # combined_df = combine_dataset2(data_dir, str(data_dir/ "combined_dataset"))
     # combined_df = combined_df.with_columns(pl.col('Prototype').cast(pl.Enum(list(combined_df['Prototype'].unique()))))
@@ -88,12 +133,6 @@ def __():
 def __(participant_dir, read_trials):
     study_df = read_trials(participant_dir)
     return study_df,
-
-
-@app.cell
-def __(study_df):
-    study_df.columns
-    return
 
 
 @app.cell
@@ -267,26 +306,6 @@ def __(alt, facet_base1):
     )
     accel_facet
     return accel_facet, accel_window
-
-
-@app.cell
-def __(mo):
-    mo.md(
-        """
-        ## SCHEMA
-        # # SONG_USER_PLAY_PAUSE => 0 = PAUSE, 1 =PLAY
-        # # SONG_RESEARCHER_PLAY_PAUSE => 0 = PAUSE, 1 =PLAY
-        # # SONG_PLAYPAUSE_ACK => 0 = PAUSE,1=PLAY
-        # # SONG_NEXT_PREVIOUS => -1=Previous , 1 = Next
-        # # SONG_OOB => -1=Previous , 1 = Next
-        """
-    )
-    return
-
-
-@app.cell
-def __():
-    return
 
 
 @app.cell
