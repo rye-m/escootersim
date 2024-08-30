@@ -10,19 +10,23 @@ def __():
     import polars as pl
     import altair as alt
     from utils.plotting import downsample, image_to_altair
-    from utils.process_sim_csv import Prototype, Task, process_csv
+    from utils.process_sim_csv import Prototype, Task, process_csv, combine_dataset
     from itertools import product
     from pathlib import Path
+
     data_path = Path("./Data/")
-    b64_image = image_to_altair(data_path / "map2.png", data_path/ "b64_map2.txt")
-    df = pl.read_parquet("./Data/combined_dataset.parquet")
+    b64_image = image_to_altair(data_path / "map2.png", data_path / "b64_map2.txt")
     out_path = Path("./Figures/")
+    data_dir = Path("./Data/")
+    df = pl.read_parquet(data_dir.glob("*.parquet"))
     return (
         Path,
         Prototype,
         Task,
         alt,
         b64_image,
+        combine_dataset,
+        data_dir,
         data_path,
         df,
         downsample,
@@ -37,12 +41,19 @@ def __():
 
 @app.cell
 def __():
+    # optimal_path_path = Path('./Data/Optimal_path.csv')
+    # optimal_df = process_csv(optimal_path_path)
+    # optimal_df.write_csv('./Data/Optimal_path_expanded.csv')
+    # combined_df = combine_dataset(data_dir, str(data_dir/ "combined_dataset"))
+
+    # for tsk in Task:
+    #     partition = combined_df.filter(pl.col('Task').eq(tsk))
+    #     partition.write_parquet(data_dir / f"combined_{tsk.value}.parquet", compression_level=22)
     return
 
 
 @app.cell
-def __(df):
-    df.head()
+def __():
     return
 
 
@@ -180,19 +191,8 @@ def __(Task, df, downsample, pl):
 
 
 @app.cell
-def __(Path, process_csv):
-    optimal_path_path = Path('./Data/Optimal_path.csv')
-    optimal_df = process_csv(optimal_path_path)
-    optimal_df.write_csv('./Data/Optimal_path_expanded.csv')
-    return optimal_df, optimal_path_path
-
-
-app._unparsable_cell(
-    r"""
-    optimal_df.
-    """,
-    name="__"
-)
+def __():
+    return
 
 
 @app.cell

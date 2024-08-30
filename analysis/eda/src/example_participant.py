@@ -111,10 +111,10 @@ def __(alt, pl, proto, study_df, task):
 
 
 @app.cell
-def __():
-    # combined_df = combine_dataset2(data_dir, str(data_dir/ "combined_dataset"))
+def __(combine_dataset, data_dir):
+    combined_df = combine_dataset(data_dir, str(data_dir/ "combined_dataset"))
     # combined_df = combined_df.with_columns(pl.col('Prototype').cast(pl.Enum(list(combined_df['Prototype'].unique()))))
-    return
+    return combined_df,
 
 
 @app.cell
@@ -124,8 +124,8 @@ def __():
 
 
 @app.cell
-def __():
-    # combined_df.head()
+def __(combined_df):
+    combined_df['participantID'].unique()
     return
 
 
