@@ -19,6 +19,7 @@ def __():
     out_path = Path("./Figures/")
     data_dir = Path("./Data/")
     df = pl.read_parquet(data_dir.glob("*.parquet"))
+    alt.data_transformers.enable('marimo_csv')
     return (
         Path,
         Prototype,
@@ -49,11 +50,6 @@ def __():
     # for tsk in Task:
     #     partition = combined_df.filter(pl.col('Task').eq(tsk))
     #     partition.write_parquet(data_dir / f"combined_{tsk.value}.parquet", compression_level=22)
-    return
-
-
-@app.cell
-def __():
     return
 
 
@@ -191,13 +187,38 @@ def __(Task, df, downsample, pl):
 
 
 @app.cell
-def __():
-    return
+def __(Prototype, Task, df, pl):
+    nback_button = df.filter((pl.col("Task") == Task.NBACK )& (pl.col("Prototype") == Prototype.BUTTON))
+    nback_button
+    return nback_button,
 
 
 @app.cell
-def __():
-    return
+def __(alt, nback_button, pl):
+    route = (
+        alt.Chart(nback_button)
+        .mark_circle(size=30)
+        .encode(
+            alt.X("x_pos:Q").scale(domain=[-100, 100]),
+            alt.Y("z_pos:Q").scale(domain=[-100, 100]),
+            alt.Color("velocity_magnitude"),
+        )
+    )
+
+    points = (
+        alt.Chart(
+            nback_button.filter(pl.col("ws_action").eq("NBACK_CLIENT_RESPONSE"))
+        )
+        .mark_circle(color="yellow", size=50, opacity=0.3)
+        .encode(
+            alt.X("x_pos:Q").scale(domain=[-100, 100]),
+            alt.Y("z_pos:Q").scale(domain=[-100, 100]),
+        )
+    )
+
+
+    (route + points) 
+    return points, route
 
 
 @app.cell
