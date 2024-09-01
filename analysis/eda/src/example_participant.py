@@ -124,12 +124,6 @@ def __():
 
 
 @app.cell
-def __(combined_df):
-    combined_df['participantID'].unique()
-    return
-
-
-@app.cell
 def __(participant_dir, read_trials):
     study_df = read_trials(participant_dir)
     return study_df,

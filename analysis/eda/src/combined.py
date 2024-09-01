@@ -41,16 +41,16 @@ def __():
 
 
 @app.cell
-def __():
-    # optimal_path_path = Path('./Data/Optimal_path.csv')
-    # optimal_df = process_csv(optimal_path_path)
-    # optimal_df.write_csv('./Data/Optimal_path_expanded.csv')
-    # combined_df = combine_dataset(data_dir, str(data_dir/ "combined_dataset"))
+def __(Path, Task, combine_dataset, data_dir, pl, process_csv):
+    optimal_path_path = Path('./Data/Optimal_path.csv')
+    optimal_df = process_csv(optimal_path_path)
+    optimal_df.write_csv('./Data/Optimal_path_expanded.csv')
+    combined_df = combine_dataset(data_dir, str(data_dir/ "combined_dataset"))
 
-    # for tsk in Task:
-    #     partition = combined_df.filter(pl.col('Task').eq(tsk))
-    #     partition.write_parquet(data_dir / f"combined_{tsk.value}.parquet", compression_level=22)
-    return
+    for tsk in Task:
+        partition = combined_df.filter(pl.col('Task').eq(tsk))
+        partition.write_parquet(data_dir / f"combined_{tsk.value}.parquet", compression_level=22)
+    return combined_df, optimal_df, optimal_path_path, partition, tsk
 
 
 @app.cell
