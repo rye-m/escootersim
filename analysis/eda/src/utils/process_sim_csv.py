@@ -189,6 +189,7 @@ nback_ws_map = {
         "NBACK_DIGIT",
         pl.col("Websocket_message_action").str.strip_chars(),
     ),
+    "timedout": ("NBACK_TIMEOUT", 1),
     "yes|no": (
         "NBACK_CLIENT_RESPONSE",
         pl.col("Websocket_message_action")
@@ -333,8 +334,8 @@ def combine_dataset(data_dir, output=None):
         df = df.with_columns(pl.lit(participant.name).alias("participantID"))
         dfs.append(df)
     combined_df = pl.concat(dfs)
-    if output is not None:
-        combined_df.write_csv(output + '.csv')
-        combined_df.write_parquet(output + '.parquet')
+    # if output is not None:
+        # combined_df.write_csv(output + '.csv')
+        # combined_df.write_parquet(output + '.parquet')
          
     return combined_df
