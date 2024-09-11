@@ -226,9 +226,9 @@ def __(pl):
 
 
 @app.cell
-def __(Task, data, pl, windows):
+def __(CENTER, Task, WINDOW, data, pl, windows):
     nbacks = data.filter(pl.col("Task").eq(Task.NBACK))
-    nbacks = windows(nbacks, "NBACK_DIGIT", 0.5)
+    nbacks = windows(nbacks, CENTER, WINDOW)
 
     nbacks = nbacks.with_columns(
         [
@@ -431,19 +431,23 @@ def __(PARTICIPANT, PROTO, TASK, data, pl):
             pl.col("A escooter rot_x").rolling_std(100).alias("rot_std_x"),
             pl.col("A escooter rot_y").rolling_std(100).alias("rot_std_y"),
             pl.col("A escooter rot_z").rolling_std(100).alias("rot_std_z"),
+            pl.col("velocity_magnitude").rolling_mean(50).alias("vel_mean"),
+            pl.col("velocity_magnitude").rolling_std(50).alias("vel_std")
         ]
     )
-    # individual
+    individual
     return individual,
 
 
 @app.cell
 def __(alt, individual, pl):
+    Y = 'vel_mean'
+
     stdy = (
         alt.Chart(individual)
         .mark_line()
         .encode(
-            alt.X("ScenarioTime:Q"), alt.Y("rot_std_y:Q"), alt.Color("Prototype")
+            alt.X("ScenarioTime:Q"), alt.Y(f"{Y}:Q"), alt.Color("Prototype")
         )
     )
 
@@ -453,7 +457,7 @@ def __(alt, individual, pl):
         .mark_circle(size=90, shape="triangle", filled=True, color="red")
         .encode(
             alt.X("ScenarioTime"),
-            alt.Y("rot_std_y"),
+            alt.Y(f"{Y}"),
         )
     )
 
@@ -464,14 +468,14 @@ def __(alt, individual, pl):
         .mark_circle(size=90, color="green")
         .encode(
             alt.X("ScenarioTime"),
-            alt.Y("rot_std_y"),
+            alt.Y(Y),
         )
     )
 
     # stdy[0].properties(width=700).interactive()
 
     (stdy + numbers + presses).properties(width=600).interactive()
-    return numbers, presses, stdy
+    return Y, numbers, presses, stdy
 
 
 @app.cell
@@ -553,6 +557,11 @@ def __(nbacks, pl):
 
 
 @app.cell
+def __():
+    return
+
+
+@app.cell
 def __(pl, test_std):
     test_std.select([pl.col("Prototype"), pl.col("^.*_.*$").diff()]).filter(
         pl.col("event_window").eq(2)
@@ -581,11 +590,23 @@ app._unparsable_cell(
 
 
 @app.cell
-def __(alt, test_std):
+def __():
+    CENTER = "NBACK_CLIENT_RESPONSE"
+    WINDOW = 0.75
+    DEPENDANT = "accel_std_mag"
+    return CENTER, DEPENDANT, WINDOW
+
+
+@app.cell
+def __(DEPENDANT, alt, pl, test_std):
+    combined = test_std.group_by(pl.col(["Prototype", "event_window"])).agg(
+        pl.col(DEPENDANT).mean()
+    )
+
     base_std = alt.Chart(test_std).encode(
         x=alt.X("event_window:N"),
         y=alt.Y(
-            "steering_energy:Q",
+            f"{DEPENDANT}:Q",
             axis=alt.Axis(title="Acceleration Magnitude Std Dev"),
         ),
         color=alt.Color("Prototype:N", legend=alt.Legend(title="Prototype")),
@@ -595,6 +616,8 @@ def __(alt, test_std):
         tooltip=["Prototype", "Task", "participantID", "event", "gyro_std_mag"]
     )
 
+
+    # combined_lines = combined_base.mark_line(opacity=1).encode(detail="event")
     lines = base_std.mark_line(opacity=0.15).encode(detail="event")
 
     mean_lines = base_std.mark_line(size=3).encode(detail="Prototype")
@@ -609,8 +632,34 @@ def __(alt, test_std):
     )
 
     # Display the chart_std
-    chart_std
-    return base_std, chart_std, lines, mean_lines, points
+    chart_std.interactive()
+    return base_std, chart_std, combined, lines, mean_lines, points
+
+
+@app.cell
+def __(CENTER, DEPENDANT, alt, combined):
+    combined_base = alt.Chart(combined).encode(
+        x=alt.X("event_window:N"),
+        y=alt.Y(f"{DEPENDANT}:Q"),
+        color=alt.Color("Prototype:N", legend=alt.Legend(title="Prototype")),
+    )
+
+    combined_points = combined_base.mark_circle(
+        size=100, color="purple", opacity=0.8
+    ).encode(tooltip=["Prototype", DEPENDANT])
+
+    c_lines = combined_base.mark_line().encode(detail="Prototype")
+
+    (combined_points + c_lines).properties(
+        width=300, title=f"before and after {CENTER}"
+    ).interactive()
+    return c_lines, combined_base, combined_points
+
+
+@app.cell
+def __(combined):
+    combined
+    return
 
 
 @app.cell
