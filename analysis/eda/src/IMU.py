@@ -593,7 +593,7 @@ app._unparsable_cell(
 def __():
     CENTER = "NBACK_CLIENT_RESPONSE"
     WINDOW = 0.75
-    DEPENDANT = "accel_std_mag"
+    DEPENDANT = "gyro_std_mag"
     return CENTER, DEPENDANT, WINDOW
 
 
@@ -637,6 +637,12 @@ def __(DEPENDANT, alt, pl, test_std):
 
 
 @app.cell
+def __(test_std):
+    test_std.select(['Prototype', 'participantID', 'event_window', 'event','accel_std_mag', 'gyro_std_mag'])
+    return
+
+
+@app.cell
 def __(CENTER, DEPENDANT, alt, combined):
     combined_base = alt.Chart(combined).encode(
         x=alt.X("event_window:N"),
@@ -654,6 +660,12 @@ def __(CENTER, DEPENDANT, alt, combined):
         width=300, title=f"before and after {CENTER}"
     ).interactive()
     return c_lines, combined_base, combined_points
+
+
+@app.cell
+def __(combined):
+    combined
+    return
 
 
 @app.cell

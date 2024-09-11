@@ -273,7 +273,7 @@ def __():
 
 @app.cell
 def __(mo):
-    mo.md("### timeout percentage")
+    mo.md("""### timeout percentage""")
     return
 
 
@@ -296,7 +296,7 @@ def __(df, pl):
 
 @app.cell
 def __(mo):
-    mo.md("### Comparing timing")
+    mo.md("""### Comparing timing""")
     return
 
 
@@ -314,14 +314,14 @@ def __(pl, timings):
         pl.col('responseTime').mean().alias('mean response time'),
         # pl.col('responseTime').median().alias('median response time'),
         pl.col('responseTime').std().alias('std response time'),
-        
+
     ])
     return
 
 
 @app.cell
 def __(mo):
-    mo.md('scatter plot with velocity in time frame?')
+    mo.md("""scatter plot with velocity in time frame?""")
     return
 
 
