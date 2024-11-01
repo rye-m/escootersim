@@ -27,7 +27,7 @@ def __():
         return False, file_name
 
     if __name__ == "__main__":
-        
+
         # Get file path from the user
         folder_path = "/Users/ryem/Desktop/Cornell_Tech/escootersim/analysis/eda/Data/"
         folders_temp = os.listdir(folder_path)
@@ -36,28 +36,30 @@ def __():
             if item.startswith("P"):
                 folders.append(item)
         print(folders)
-        
+
         for folder in folders:
             print(folder)
             file_counter = 0
             folder_counter +=1
             filename_list = ["ScooterStudyenv", "Nback_Button", "Nback_Footbutton", "Nback_Phone", "Nback_Voice", "Nback_Throttle", "Nback_Watch", "Song_Button", "Song_Footbutton", "Song_Phone", "Song_Voice", "Song_Throttle", "Song_Watch"]
 
-        
+
             files = os.listdir(folder_path + "/" + folder)
             for file in files:
                 # Validate the file path
                 if os.path.isfile(folder_path + "/" + folder + "/" + file):
-            
+
                     result = check_file_name(folder_path + "/" + file)
-            
+
                     if result is True:
                         # print("The file name is correct.")
                         file_counter+=1
                     else:
                         print(f"Unmatched file name: {result[1]}")
-            print("\tTotal file number: " + str(file_counter))
-            print("\tThe list: ", filename_list)
+            if file_counter != 13:
+                print("Error! file number:", file_counter)
+            if filename_list != []:
+                print("Error! file name list:", filename_list)
         print("folder_counter:", folder_counter)
     return (
         check_file_name,
