@@ -83,3 +83,7 @@ Videos/.DS_Store
 
 #ignore all qualtrics exports
 *Scooterseim*
+
+
+#ignore all toml file
+*.toml
