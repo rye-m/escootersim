@@ -24,11 +24,12 @@ def _():
     parquet_files = list(data_dir.glob("*.parquet"))
 
     # First, let's check what files we found
-    print("Found parquet files:", parquet_files)
+    # print("Found parquet files:", parquet_files)
 
     # Then read the files
     df = pl.read_parquet(parquet_files)
-    print(df.head())
+    # print(df.head())
+    df
 
 
     # # print(data_dir.glob("*.parquet"))
@@ -138,7 +139,6 @@ def _(alt, scatter_df_with, scatter_df_without):
 
     # Show or save the combined chart
     combined_chart.show()
-
     return chart_with, chart_without, combined_chart
 
 
@@ -198,7 +198,6 @@ def _(alt, scatter_df_with, scatter_df_without, sorted_prototypes):
 
     # Show or save the combined chart
     Nback_combined_chart.show()
-
     return Nback_chart_with, Nback_chart_without, Nback_combined_chart
 
 
@@ -226,7 +225,7 @@ def _(scatter_df_with, scatter_df_without):
     # Perform hypothesis testing
     def hypothesis_test(group1, group2, column_name, alpha=0.05):
         print(f"\nTesting for {column_name}:")
-        
+
         # Check normality for both groups
         is_group1_normal = check_normality(group1, column_name)
         is_group2_normal = check_normality(group2, column_name)
@@ -243,7 +242,7 @@ def _(scatter_df_with, scatter_df_without):
 
         # Print results
         print(f"{test_name}: Test-statistic = {t_stat}, p-value = {p_value}")
-        
+
         # Interpret results
         if p_value < alpha:
             print(f"Result: Reject the null hypothesis (there is NOT a significant difference).")
@@ -254,7 +253,6 @@ def _(scatter_df_with, scatter_df_without):
     hypothesis_test(scatter_df_with, scatter_df_without, "duration")
     hypothesis_test(scatter_df_with, scatter_df_without, "median_velocity")
     hypothesis_test(scatter_df_with, scatter_df_without, "mean_velocity")
-
     return (
         check_normality,
         hypothesis_test,
@@ -262,6 +260,25 @@ def _(scatter_df_with, scatter_df_without):
         shapiro,
         ttest_ind,
     )
+
+
+@app.cell
+def _(alt, df, pl, sorted_prototypes):
+    # check if all of them have the NBACK_CLIENT_TOTAL
+
+    df_clean = df.filter(pl.col('ws_action') == "NBACK_CLIENT_ACCURACY")
+    df_accracy = df_clean['ws_action', 'ws_value', 'Prototype', "participantID"]
+
+
+    Nback_accracy = alt.Chart(df_accracy).mark_circle().encode(
+        alt.X("Prototype", sort=sorted_prototypes),
+        alt.Y("ws_value", scale=alt.Scale(domain=[0, 100])),
+        alt.Color("Prototype"),
+        tooltip="participantID",
+        # xOffset="Task:N",
+    ).properties(title="Task Performance: Nback Accracy (%)")
+    Nback_accracy.show()
+    return Nback_accracy, df_accracy, df_clean
 
 
 @app.cell(disabled=True)

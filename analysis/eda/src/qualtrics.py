@@ -65,9 +65,13 @@ def _(qual_results):
 
 
 @app.cell
-def _(pd, plt, qual_results, sns):
+def _(pd, plt, qual_results):
     # import data
     # qual_results = pd.read_csv("/Users/ryem/Downloads/Scooterseim Aug 27 2024.csv")
+
+    # Convert the list to a single string for y-axis label
+    questionnaire_order_str = ', '.join(['Mental demand', 'Physical demand', 'Temporal demand', 'Performance', 'Effort', 'Frustration'])
+    interfaceXtask_order_lst = ['Song + Phone', 'Song + Watch', 'Song + Footbutton', 'Nback + Phone', 'Song + Voice', 'Song + Button', 'Song + Throttle', 'Nback + Watch', 'Nback + Footbutton', 'Nback + Voice', 'Nback + Button', 'Nback + Throttle']
 
 
     # get average of every col with Q159 <Test Ride>
@@ -165,24 +169,6 @@ def _(pd, plt, qual_results, sns):
     # Create a single figure with a 4x3 grid of subplots
     fig, axes = plt.subplots(nrows=4, ncols=3, figsize=(20, 15))
 
-    # List of all DataFrames
-    data_list = [q149, q145, q125, q153, q121, q117, q109, q143, q137, q135, q139, q133]
-    # List of all axes
-    ax_list = axes.flatten()
-
-    # Plot each DataFrame on the corresponding subplot
-    for data, ax in zip(data_list, ax_list):
-        # sns.boxplot(data=data, orient='h', ax=ax)
-        data = data.apply(pd.to_numeric, errors='coerce')
-        # print(data.dtypes)
-        if not data.empty:
-            # plt.boxplot(data=data, ax=ax)
-            # ax.boxplot(data.values.T)
-            sns.boxplot(data=data, orient='h', ax=ax)
-        else:
-            ax.text(0.5, 0.5, 'No Data', ha='center', va='center')  # Show 'No Data' if empty
-
-
     # Define common labels
     x_label = '1 = Very Low, 4 = Moderate, 7 = Very High'
     # y_label = 'Interface Order'
@@ -190,22 +176,45 @@ def _(pd, plt, qual_results, sns):
     # Set common x-axis label for all plots
     fig.text(0.5, 0.04, x_label, ha='center')
 
-    # Convert the list to a single string for y-axis label
-    questionnaire_order_str = ', '.join(['Mental demand', 'Physical demand', 'Temporal demand', 'Performance', 'Effort', 'Frustration'])
-    interfaceXtask_order_lst = ['Song + Phone', 'Song + Watch', 'Song + Footbutton', 'Nback + Phone', 'Song + Voice', 'Song + Button', 'Song + Throttle', 'Nback + Watch', 'Nback + Footbutton', 'Nback + Voice', 'Nback + Button', 'Nback + Throttle']
-    # Set y-axis labels for all subplots
+
+
+    # List of all DataFrames
+    data_list = [q149, q145, q125, q153, q121, q117, q109, q143, q137, q135, q139, q133]
+    # List of all axes
+    ax_list = axes.flatten()
+
     i = 0
-    for ax in ax_list:
+    # Plot each DataFrame on the corresponding subplot
+    for data, ax in zip(data_list, ax_list):
+        data = data.apply(pd.to_numeric, errors='coerce')
+
+        if not data.empty:
+            # Calculate the number of labels
+            labels = questionnaire_order_str.split(', ')
+            ax.set_yticks(range(len(labels)))  # Explicitly set the tick positions
+            ax.set_yticklabels(labels)  # Assign the tick labels
+            ax.set_title(interfaceXtask_order_lst[i])
+            
+            # Plot the mean of each column (or adjust as needed)
+            data.mean(axis=0).plot(kind='line', ax=ax, marker='o', title=interfaceXtask_order_lst[i])
+            # ax.set_yticks(range(len(labels)))  # Set x-ticks for each column
+            # ax.set_xticklabels(data.columns, rotation=45)  # Label x-ticks
+
+            i += 1
+            
+            # sns.boxplot(data=data, orient='h', ax=ax)
+        else:
+            ax.text(0.5, 0.5, 'No Data', ha='center', va='center')  # Show 'No Data' if empty
+
+
+
+
+
+    # for ax in ax_list:
         # ax.set_yticklabels(questionnaire_order_str.split(', '))
         # ax.set_title(interfaceXtask_order_lst[i])
         # i += 1
 
-        # Calculate the number of labels
-        labels = questionnaire_order_str.split(', ')
-        ax.set_yticks(range(len(labels)))  # Explicitly set the tick positions
-        ax.set_yticklabels(labels)  # Assign the tick labels
-        ax.set_title(interfaceXtask_order_lst[i])
-        i += 1
 
     # Improve layout
     plt.tight_layout(rect=[0.05, 0.1, 0.95, 0.9])  # Adjust layout to fit common labels
